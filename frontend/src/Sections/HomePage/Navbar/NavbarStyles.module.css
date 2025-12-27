@@ -1,0 +1,112 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #000;
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.logocontainer {
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
+}
+
+.logo {
+  height: 60px;
+  width: 60px;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: rotate(-12.5deg) scale(1.1);
+}
+
+.name {
+  display: flex;
+  align-items: center;
+}
+
+.name h1 {
+  font-family: "Poppins", sans-serif;
+  font-size: 2rem;
+  margin-top: 1.25rem;
+}
+
+.line {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: rgba(9, 20, 183, 0.938);
+  box-shadow: 
+    0 0 10px #0e24ea,
+    0 0 20px #0971da;
+}
+
+
+.info{
+  position: fixed;
+  display: flex;
+  gap: 2.5rem;
+  left: 400px;
+  align-items: center;
+  font-size: 1.2rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+    color: rgb(208, 183, 208);
+
+}
+.navlink{
+  transition: all 0.3s ease;
+  box-shadow: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.navlink:hover {
+  color: #6366f1;
+}
+
+.navlink.active {
+  background: linear-gradient(90deg, 
+    #3b82f6 0%,    
+    #7c3aed 50%,   
+    #ec4899 100%   
+  );
+  border-radius: 5%;
+  color: white;
+}
+
+.navlink.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.navlink.active:hover::after {
+  left: 100%;
+}
+
+
+

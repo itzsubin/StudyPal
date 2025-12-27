@@ -1,0 +1,44 @@
+:root {
+  --gradient-primary: linear-gradient(to bottom, #eff6ff 0%, #faf5ff 50%, #fce7f3 100%);
+  --gradient-text: linear-gradient(to right, #2563eb, #9333ea, #db2777);
+}
+
+.container {
+  position: relative;
+  padding-top: 8.5rem;
+  padding-bottom: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background: var(--gradient-primary);
+  width: 100vw;
+  height: 45vw;
+     margin-left: calc(-50vw + 50%);
+  overflow: hidden;
+}
+
+.grade {
+  position: absolute;
+  right: -50px;
+  top: -5px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.A {
+  width: 400px;
+  height: 450px;
+  transform: rotateY(45deg);
+  z-index: 2;
+}
+
+.arrow {
+  position: absolute;
+  right: -750px;
+  top: 92px;
+  z-index: 1;
+  pointer-events: none;
+  transform: rotateZ(30deg) rotateY(190deg) rotateX(70deg);
+  overflow: hidden;
+}
+
+

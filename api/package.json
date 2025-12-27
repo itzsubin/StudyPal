@@ -1,0 +1,19 @@
+{
+	"name": "api",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"typescript": "^5.5.2",
+		"wrangler": "^4.51.0"
+	},
+	"dependencies": {
+		"itty-router": "^5.0.22",
+		"pdf-parse": "^2.4.5"
+	}
+}
