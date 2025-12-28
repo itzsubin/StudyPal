@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Brain, BookOpen, CheckCircle, AlertCircle, ArrowRight, ArrowLeft, Sparkles, BrainCircuit, StickyNote, NotebookText, RefreshCw, Zap, CopyCheck, NotebookPen } from 'lucide-react';
+import { Upload, FileText, Brain, BookOpen, CheckCircle, AlertCircle, ArrowRight, ArrowLeft, Sparkles, BrainCircuit, StickyNote, NotebookText, RefreshCw, Zap, CopyCheck, NotebookPen, RotateCcw } from 'lucide-react';
 import styles from './FlashStyles.module.css'; 
 
 function FlashCard() {
@@ -176,7 +176,7 @@ function FlashCard() {
   return (
     <div className = {styles.container}>
 
-{/* Processing */}
+  {/* Processing */}
   {isProcessing && (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
       <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-md w-full mx-4 text-center">
@@ -199,8 +199,8 @@ function FlashCard() {
 
       {/* Step 1 - upload*/}
 
-      {!isProcessing && currentStep === 1 && (
-        <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8 ">
+      {currentStep === 1 && (
+        <div className="flex justify-center items-center p-8 ">
           <div className="max-w-3xl w-full">
             <div className="text-center mb-12">
               <Sparkles className="w-12 h-12 text-blue-600 mx-auto mb-4" />
@@ -262,7 +262,7 @@ function FlashCard() {
       {/* Step 2: Mode Selection */}
 
         {currentStep === 2 && (
-        <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8">
+        <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] p-8">
           <div className="max-w-5xl w-full text-center">
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
               How do you want to study?
@@ -330,9 +330,229 @@ function FlashCard() {
         </div>
       )}
 
+    {currentStep === 4 && selectedMode === 'recall' && ( 
+      <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8"> 
+        <div className="max-w-3xl w-full"> 
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => setCurrentStep(3)} 
+                className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              {reviewCards.length > 0 && (
+                <button 
+                  onClick={goToReviewSection} 
+                  className="bg-yellow-100 border-2 border-yellow-400 text-yellow-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-yellow-200 transition"
+                >
+                  <RotateCcw size={16} />
+                  Review ({reviewCards.length})
+                </button>
+              )}
+            </div>
 
-    </div>
-  )
+            <div 
+              onClick={() => setIsFlipped(!isFlipped)}
+              className="w-full perspective-1000 cursor-pointer mb-8"
+            >
+              <div className={`relative w-full min-h-[400px] transition-transform duration-600 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
+                {/* Front of card */}
+                <div className="absolute w-full backface-hidden rounded-2xl bg-white border-2 border-gray-200 shadow-xl overflow-hidden">
+                  <div className="bg-gradient-to-br from-indigo-300 to-blue-600 px-8 py-6 text-white">
+                    <div className="text-sm font-semibold opacity-90 mb-1">QUESTION</div>
+                      <div className="text-base font-semibold text-gray-900">
+                        {currentCardIndex + 1} / {flashcards.length}
+                      </div>
+                  </div>
+                  <div className="p-10 flex flex-col items-center justify-center min-h-[300px]">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8 leading-snug">
+                      {flashcards[currentCardIndex]?.question}
+                    </h2>
+                    <div className="flex items-center mb-4 gap-2 text-gray-500 text-sm">
+                      <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                        <ArrowRight size={16} />
+                      </div>
+                      <span className="font-medium">Tap to reveal answer</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Back of card */}
+                <div className="absolute w-full backface-hidden rounded-2xl bg-white border-2 border-gray-200 shadow-xl overflow-hidden rotate-y-180">
+                  <div className="bg-gradient-to-r from-green-500 to-teal-600 px-8 py-6 text-white">
+                    <div className="text-sm font-semibold opacity-90 mb-1">ANSWER</div>
+                  </div>
+                  <div className="p-10 flex items-center justify-center min-h-[300px]">
+                    <p className="text-xl text-gray-800 leading-relaxed">
+                      {flashcards[currentCardIndex]?.answer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {isFlipped && (
+              <div className="flex gap-4 mb-8">
+                <button 
+                  onClick={markForReview} 
+                  className="flex-1 py-4 rounded-xl text-lg font-semibold border-2 border-yellow-400 flex items-center justify-center gap-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition"
+                >
+                  <AlertCircle size={20} />
+                  Review Again
+                </button>
+                <button 
+                  onClick={() => markAsUnderstood(false)} 
+                  className="flex-1 py-4 rounded-xl text-lg font-semibold border-2 border-green-400 flex items-center justify-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 transition"
+                >
+                  <CheckCircle size={20} />
+                  I Know This
+                </button>
+              </div>
+            )}
+
+            <div className="flex gap-4 mb-6">
+              <button 
+                onClick={prevCard} 
+                disabled={currentCardIndex === 0} 
+                className="flex-1 py-3 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 flex items-center justify-center gap-2 hover:border-blue-600 hover:text-blue-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ArrowLeft size={20} />
+                Previous
+              </button>
+              <button 
+                onClick={nextCard} 
+                disabled={currentCardIndex === flashcards.length - 1} 
+                className="flex-1 py-3 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 flex items-center justify-center gap-2 hover:border-blue-600 hover:text-blue-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next
+                <ArrowRight size={20} />
+              </button>
+            </div>
+            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 transition-all duration-300"
+                style={{ width: `${((currentCardIndex + 1) / flashcards.length) * 100}%` }}
+              ></div>
+            </div>
+
+            <div className="flex justify-between text-sm text-gray-600 font-medium">
+              <span>{understood.length} understood</span>
+              <span>{reviewCards.length} to review</span>
+            </div>           
+        </div>
+      </div>
+    )}
+
+     {/* Step 5: Review Section */}
+      {currentStep === 5 && (
+        <div className="flex justify-center items-start min-h-[calc(100vh-5rem)] p-8">
+          <div className="max-w-4xl w-full">
+            <div className="flex items-center justify-between mb-8">
+              <button 
+                onClick={() => setCurrentStep(4)} 
+                className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <h1 className="text-3xl font-bold text-gray-900">Review Cards</h1>
+              <div className="w-10"></div>
+            </div>
+
+            {reviewCards.length === 0 ? (
+              <div className="text-center py-20">
+                <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                  All caught up!
+                </h2>
+                <p className="text-lg text-gray-600 mb-8">
+                  You have no cards marked for review.
+                </p>
+                <button 
+                  onClick={() => setCurrentStep(4)} 
+                  className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition transform hover:scale-105"
+                >
+                  Back to Study
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <p className="text-lg text-gray-600 mb-6">
+                  You have <span className="font-bold text-yellow-700">{reviewCards.length} card(s)</span> marked for review. Mark them as understood to remove from this list.
+                </p>
+
+                {reviewCards.map((cardId) => {
+                  const card = getReviewCardData(cardId);
+                  if (!card) return null;
+
+                  return (
+                    <div key={cardId} className="bg-white border-2 border-yellow-400 rounded-2xl p-8 shadow-lg">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 mb-3">
+                            {selectedMode === 'recall' ? card.question : card.title}
+                          </h3>
+                          {selectedMode === 'recall' ? (
+                            <p className="text-base text-gray-700 leading-relaxed">
+                              {card.answer}
+                            </p>
+                          ) : (
+                            <ul className="list-none p-0">
+                              {card.points.map((point, idx) => (
+                                <li key={idx} className="flex items-start gap-3 py-2 text-base text-gray-700">
+                                  <span className="text-green-600 text-xl leading-none">•</span>
+                                  {point}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-3 mt-6">
+                        <button 
+                          onClick={() => markAsUnderstood(true, cardId)} 
+                          className="flex-1 py-3 rounded-xl font-semibold border-2 border-green-400 flex items-center justify-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 transition"
+                        >
+                          <CheckCircle size={20} />
+                          Mark as Understood
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+<style jsx>{`
+        .perspective-1000 {
+          perspective: 1000px;
+        }
+        .preserve-3d {
+          transform-style: preserve-3d;
+        }
+        .backface-hidden {
+          backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+          transform: rotateY(180deg);
+        }
+        .border-3 {
+          border-width: 3px;
+        }
+        .duration-600 {
+          transition-duration: 0.6s;
+        }
+        .delay-100 {
+          animation-delay: 0.1s;
+        }
+        .delay-200 {
+          animation-delay: 0.2s;
+        }
+      `}
+</style>
+</div>
+);
 }
-
 export default FlashCard;
