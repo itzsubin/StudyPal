@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Brain, BookOpen, CheckCircle, AlertCircle, ArrowRight, ArrowLeft, Sparkles, BrainCircuit, StickyNote, NotebookText, RefreshCw, Zap, CopyCheck, NotebookPen, RotateCcw } from 'lucide-react';
+import { Upload, FileText, Brain, BookOpen, CheckCircle, AlertCircle, ArrowRight, ArrowLeft, Sparkles, BrainCircuit, StickyNote, NotebookText, RefreshCw, Zap, CopyCheck, NotebookPen, RotateCcw, Layers, Lightbulb, MessageSquare } from 'lucide-react';
 import styles from './FlashStyles.module.css'; 
 
 function FlashCard() {
@@ -12,7 +12,13 @@ function FlashCard() {
   const [understood, setUnderstood] = useState([]);
   const [reviewCards, setReviewCards] = useState([]);
   const [cardlimit, setCardLimit] = useState(15);
-   const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [isLoadingHint, setIsLoadingHint] = useState(false);
+  const [hintText, setHintText] = useState('');
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
+  const [explanationText, setExplanationText] = useState('');
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -28,12 +34,12 @@ function FlashCard() {
   }
 
   const handleTextGenerate = () => {
-
     setIsProcessing(true);
     // TODO: API CALL - Process text
     setTimeout(() => {
       setIsProcessing(false);
-      setCurrentStep(2)}, 2000);
+      setCurrentStep(2);
+    }, 2000);
   };
 
   const selectMode = (mode) => {
@@ -42,7 +48,7 @@ function FlashCard() {
     const limit = mode === 'recall' ? 15 : 20;
     setCardLimit(limit);
 
-// TODO: API CALL - Request flashcards with limit
+    // TODO: API CALL - Request flashcards with limit
 
     const mockCards = mode === 'recall' 
       ? Array(limit).fill(0).map((_, i) => ({
@@ -89,15 +95,21 @@ function FlashCard() {
     if(currentCardIndex < flashcards.length - 1) {
       setCurrentCardIndex(currentCardIndex + 1);
       setIsFlipped(false);
+      setShowHint(false);
+      setShowExplanation(false);
+      setHintText('');
+      setExplanationText('');
     }
   };
 
   const prevCard = () => {
-    if(currentCardIndex > 0){
-      if (currentCardIndex > 0) {
-        setCurrentCardIndex(currentCardIndex - 1);
-        setIsFlipped(false);
-      }
+    if(currentCardIndex > 0) {
+      setCurrentCardIndex(currentCardIndex - 1);
+      setIsFlipped(false);
+      setShowHint(false);
+      setShowExplanation(false);
+      setHintText('');
+      setExplanationText('');
     }
   };
 
@@ -105,26 +117,22 @@ function FlashCard() {
     let targetID;
     if (fromReview){
       targetID = cardID;
-    
     } else {
       if (flashcards[currentCardIndex]) {
         targetID = flashcards[currentCardIndex].id;
-      }
-      else {
+      } else {
         targetID = null;
       }
     }
 
-      if (!understood.includes(targetID)) {
+    if (!understood.includes(targetID)) {
       setUnderstood([...understood, targetID]);
-      
       // TODO: API CALL - Save progress as understood
       // Example: saveProgress(targetId, 'understood')
     }
 
-      if (fromReview) {
+    if (fromReview) {
       setReviewCards(reviewCards.filter(id => id !== cardID));
-      
       // TODO: API CALL - Remove from review list
       // Example: removeFromReview(cardId)
     } else {
@@ -133,22 +141,19 @@ function FlashCard() {
   };
   
   const markForReview = () => {
-      let cardID;
-      if(flashcards[currentCardIndex]){
-        cardID = flashcards[currentCardIndex].id;
-      } else {
-        cardID = undefined;
-      }
+    let cardID;
+    if(flashcards[currentCardIndex]){
+      cardID = flashcards[currentCardIndex].id;
+    } else {
+      cardID = undefined;
+    }
 
-      if(!reviewCards.includes(cardID)){
-        setReviewCards([...reviewCards, cardID]);
-
+    if(!reviewCards.includes(cardID)){
+      setReviewCards([...reviewCards, cardID]);
       // TODO: API CALL - Mark card for review
       // Example: saveProgress(cardId, 'review')
-
-      }
-
-        nextCard();
+    }
+    nextCard();
   };
 
   const goToReviewSection = () => {
@@ -173,32 +178,112 @@ function FlashCard() {
     return flashcards.find(card => card.id === cardId);
   };
 
+  const requestHint = () => {
+    if (showHint) {
+      setShowHint(false);
+      return;
+    }
+
+    setIsLoadingHint(true);
+    setShowHint(true);
+
+    // TODO: API CALL - Request AI-generated hint
+    // This should send the current question to your backend AI service
+    // Example:
+    // fetch('/api/flashcards/hint', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     question: flashcards[currentCardIndex].question,
+    //     cardId: flashcards[currentCardIndex].id
+    //   })
+    // })
+    // .then(res => res.json())
+    // .then(data => {
+    //   setHintText(data.hint);
+    //   setIsLoadingHint(false);
+    // })
+
+    // Mock AI hint generation
+    setTimeout(() => {
+      const mockHints = {
+        0: 'If you have a list of n items and you need to check every single one of them to find a specific number, how many "steps" or operations does the computer perform? Does that number stay the same if the list grows to a million items?',
+        1: 'Think about major Australian cities. This city was chosen as a compromise between the two largest cities in the country.',
+        default: 'Think about the key concepts related to this question. What are the main components or factors involved?'
+      };
+      setHintText(mockHints[currentCardIndex] || mockHints.default);
+      setIsLoadingHint(false);
+    }, 1000);
+  };
+
+  const requestExplanation = () => {
+    if (showExplanation) {
+      setShowExplanation(false);
+      return;
+    }
+
+    setIsLoadingExplanation(true);
+    setShowExplanation(true);
+
+    // TODO: API CALL - Request AI-generated explanation
+    // This should send the question and answer to your backend AI service
+    // Example:
+    // fetch('/api/flashcards/explain', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     question: flashcards[currentCardIndex].question,
+    //     answer: flashcards[currentCardIndex].answer,
+    //     cardId: flashcards[currentCardIndex].id
+    //   })
+    // })
+    // .then(res => res.json())
+    // .then(data => {
+    //   setExplanationText(data.explanation);
+    //   setIsLoadingExplanation(false);
+    // })
+
+    // Mock AI explanation generation
+    setTimeout(() => {
+      const mockExplanations = {
+        0: 'Time complexity helps us understand how efficient an algorithm is. For example, if an algorithm checks every item in a list (O(n)), doubling the list size doubles the time needed. This is different from O(1) which takes constant time regardless of input size.',
+        1: 'Canberra was chosen as a compromise between Sydney and Melbourne, Australia\'s two largest cities. Both wanted to be the capital, so a new city was planned and built between them in 1908.',
+        default: 'This concept is fundamental to understanding the topic. It builds on previous knowledge and connects to related ideas in the subject.'
+      };
+      setExplanationText(mockExplanations[currentCardIndex] || mockExplanations.default);
+      setIsLoadingExplanation(false);
+    }, 1000);
+  };
+
+  const generateQuiz = () => {
+    // TODO: API CALL - Generate quiz from flashcards
+    // Example: generateQuiz(flashcards).then(quiz => { ... })
+    alert('Generate Quiz - API integration pending');
+  };
+
   return (
-    <div className = {styles.container}>
-
-  {/* Processing */}
-  {isProcessing && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
-      <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-md w-full mx-4 text-center">
-        <div className="w-20 h-20 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            Analyzing your content...
-          </h2>
-          <p className="text-base text-gray-600 mb-4">
-            Our AI is extracting key concepts and creating your study materials
-          </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce delay-100"></div>
-            <div className="w-2 h-2 bg-pink-600 rounded-full animate-bounce delay-200"></div>
+    <div className={styles.container}>
+      {/* Processing */}
+      {isProcessing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-md w-full mx-4 text-center">
+            <div className="w-20 h-20 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              Analyzing your content...
+            </h2>
+            <p className="text-base text-gray-600 mb-4">
+              Our AI is extracting key concepts and creating your study materials
+            </p>
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce delay-100"></div>
+              <div className="w-2 h-2 bg-pink-600 rounded-full animate-bounce delay-200"></div>
+            </div>
           </div>
-      </div>
-    </div>
-  )}
-
+        </div>
+      )}
 
       {/* Step 1 - upload*/}
-
       {currentStep === 1 && (
         <div className="flex justify-center items-center p-8 ">
           <div className="max-w-3xl w-full">
@@ -245,7 +330,7 @@ function FlashCard() {
             <div className="flex flex-col gap-5">
               <textarea
                 placeholder="Paste your notes here..."
-                className=" w-[800px] min-h-[250px] p-6 border-2 border-gray-300 rounded-2xl text-base resize-vertical bg-white text-black focus:outline-none focus:border-blue-600 transition"
+                className="w-[800px] min-h-[250px] p-6 border-2 border-gray-300 rounded-2xl text-base resize-vertical bg-white text-black focus:outline-none focus:border-blue-600 transition"
               />
               <button 
                 onClick={handleTextGenerate}
@@ -260,8 +345,7 @@ function FlashCard() {
       )}
 
       {/* Step 2: Mode Selection */}
-
-        {currentStep === 2 && (
+      {currentStep === 2 && (
         <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] p-8">
           <div className="max-w-5xl w-full text-center">
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
@@ -277,10 +361,10 @@ function FlashCard() {
                 className="bg-gradient-to-br from-indigo-50 to-blue-200 border-[1px] border-blue-400 rounded-3xl p-10 cursor-pointer text-left transition-all hover:border-blue-600 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-6">
-                  <CopyCheck className=" w-8 h-8 text-blue-700" />
+                  <Layers className="w-8 h-8 text-blue-700" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                   Recall Cards
+                  Recall Cards
                 </h3>
                 <p className="text-lg text-gray-600 mb-4">
                   Test your memory with flip cards
@@ -330,16 +414,20 @@ function FlashCard() {
         </div>
       )}
 
-    {currentStep === 4 && selectedMode === 'recall' && ( 
-      <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8"> 
-        <div className="max-w-3xl w-full"> 
+      {/* Step 4: Recall Cards */}
+      {currentStep === 4 && selectedMode === 'recall' && ( 
+        <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8"> 
+          <div className="max-w-3xl w-full"> 
             <div className="flex items-center justify-between mb-8">
               <button 
-                onClick={() => setCurrentStep(3)} 
+                onClick={() => setCurrentStep(2)} 
                 className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition"
               >
                 <ArrowLeft size={20} />
               </button>
+              <div className="bg-blue-50 border-2 border-blue-200 px-4 py-2 rounded-xl flex items-center gap-2">
+                <span className="font-bold text-blue-900">Recall Cards</span>
+              </div>
               {reviewCards.length > 0 && (
                 <button 
                   onClick={goToReviewSection} 
@@ -352,17 +440,17 @@ function FlashCard() {
             </div>
 
             <div 
-              onClick={() => setIsFlipped(!isFlipped)}
+              onClick={() => !showHint && !showExplanation && setIsFlipped(!isFlipped)}
               className="w-full perspective-1000 cursor-pointer mb-8"
             >
               <div className={`relative w-full min-h-[400px] transition-transform duration-600 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
                 {/* Front of card */}
                 <div className="absolute w-full backface-hidden rounded-2xl bg-white border-2 border-gray-200 shadow-xl overflow-hidden">
-                  <div className="bg-gradient-to-br from-indigo-300 to-blue-600 px-8 py-6 text-white">
+                  <div className="bg-gradient-to-br from-indigo-300 to-blue-600 px-8 py-2 text-white">
                     <div className="text-sm font-semibold opacity-90 mb-1">QUESTION</div>
-                      <div className="text-base font-semibold text-gray-900">
-                        {currentCardIndex + 1} / {flashcards.length}
-                      </div>
+                    <div className="text-base font-semibold text-gray-900">
+                      {currentCardIndex + 1} / {flashcards.length}
+                    </div>
                   </div>
                   <div className="p-10 flex flex-col items-center justify-center min-h-[300px]">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8 leading-snug">
@@ -374,6 +462,23 @@ function FlashCard() {
                       </div>
                       <span className="font-medium">Tap to reveal answer</span>
                     </div>
+                  </div> 
+                  {/* Hint Button - Only on Front */}
+                  <div className="flex justify-center">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        requestHint();
+                      }}
+                      className={`absolute bottom-4 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition focus:outline-none ${
+                        showHint 
+                          ? 'bg-yellow-100 border-2 border-yellow-400 text-yellow-800' 
+                          : 'bg-yellow-50 border-2 border-yellow-300 text-yellow-700 hover:bg-yellow-100'
+                      }`}
+                    >
+                      <Lightbulb size={20} />
+                      {isLoadingHint ? 'Loading...' : showHint ? 'Hide Hint' : 'Need a Hint?'}
+                    </button>
                   </div>
                 </div>
 
@@ -385,15 +490,49 @@ function FlashCard() {
                   <div className="p-10 flex items-center justify-center min-h-[300px]">
                     <p className="text-xl text-gray-800 leading-relaxed">
                       {flashcards[currentCardIndex]?.answer}
-                    </p>
+                    </p>       
                   </div>
+                  <div className="absolute bottom-6 left-0 right-0 flex justify-center"> 
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        requestExplanation();
+                      }}  
+                      className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition ${
+                        showExplanation 
+                          ? 'bg-blue-100 border-2 border-blue-400 text-blue-800' 
+                          : 'bg-blue-50 border-2 border-blue-300 text-blue-700 hover:bg-blue-100'
+                      }`}                     
+                    >
+                      <MessageSquare size={20} />
+                      {isLoadingExplanation ? 'Loading...' : showExplanation ? 'Hide Explanation' : 'Explain'}
+                    </button>
+                  </div>           
                 </div>
               </div>
-            </div>
+            </div>  
 
-            {isFlipped && (
+            {showHint && (
+              <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-yellow-600 mt-1 flex-shrink-0" />
+                  <p className="text-base text-gray-800 leading-relaxed">{hintText}</p>
+                </div>
+              </div>
+            )}  
+
+            {showExplanation && (
+              <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
+                  <p className="text-base text-gray-800 leading-relaxed">{explanationText}</p>
+                </div>
+              </div>
+            )}        
+
+            {isFlipped && !showHint && !showExplanation && (
               <div className="flex gap-4 mb-8">
-                <button 
+                <button  
                   onClick={markForReview} 
                   className="flex-1 py-4 rounded-xl text-lg font-semibold border-2 border-yellow-400 flex items-center justify-center gap-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition"
                 >
@@ -428,6 +567,7 @@ function FlashCard() {
                 <ArrowRight size={20} />
               </button>
             </div>
+
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
               <div 
                 className="h-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 transition-all duration-300"
@@ -438,12 +578,12 @@ function FlashCard() {
             <div className="flex justify-between text-sm text-gray-600 font-medium">
               <span>{understood.length} understood</span>
               <span>{reviewCards.length} to review</span>
-            </div>           
+            </div>
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
-     {/* Step 5: Review Section */}
+      {/* Step 5: Review Section */}
       {currentStep === 5 && (
         <div className="flex justify-center items-start min-h-[calc(100vh-5rem)] p-8">
           <div className="max-w-4xl w-full">
@@ -525,7 +665,7 @@ function FlashCard() {
         </div>
       )}
 
-<style jsx>{`
+      <style jsx>{`
         .perspective-1000 {
           perspective: 1000px;
         }
@@ -550,9 +690,9 @@ function FlashCard() {
         .delay-200 {
           animation-delay: 0.2s;
         }
-      `}
-</style>
-</div>
-);
+      `}</style>
+    </div>
+  );
 }
+
 export default FlashCard;
