@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, FileText, Brain, BookOpen, CheckCircle, AlertCircle, ArrowRight, ArrowLeft, Sparkles, BrainCircuit, StickyNote, NotebookText, RefreshCw, Zap, CopyCheck, NotebookPen, RotateCcw, Layers, Lightbulb, MessageSquare } from 'lucide-react';
-import styles from './FlashStyles.module.css'; 
+import styles from './FlashStyles.module.css';
 
 function FlashCard() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -50,49 +50,49 @@ function FlashCard() {
 
     // TODO: API CALL - Request flashcards with limit
 
-    const mockCards = mode === 'recall' 
+    const mockCards = mode === 'recall'
       ? Array(limit).fill(0).map((_, i) => ({
-          id: i,
-          question: i === 0 ? 'What is Big-O Notation?' : 
-                    i === 1 ? 'What is a Binary Search Tree?' :
-                    i === 2 ? 'What is Recursion?' :
-                    `Sample Question ${i + 1}?`,
-          answer: i === 0 ? 'Big-O notation describes the time or space complexity of an algorithm as input size grows. It helps developers understand how their code performs with larger datasets.' :
-                  i === 1 ? 'A Binary Search Tree is a data structure where each node has at most two children, with left child smaller and right child larger than the parent.' :
-                  i === 2 ? 'Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem.' :
-                  `This is the answer to question ${i + 1}. It provides detailed explanation of the concept.`
-        }))
+        id: i,
+        question: i === 0 ? 'What is Big-O Notation?' :
+          i === 1 ? 'What is a Binary Search Tree?' :
+            i === 2 ? 'What is Recursion?' :
+              `Sample Question ${i + 1}?`,
+        answer: i === 0 ? 'Big-O notation describes the time or space complexity of an algorithm as input size grows. It helps developers understand how their code performs with larger datasets.' :
+          i === 1 ? 'A Binary Search Tree is a data structure where each node has at most two children, with left child smaller and right child larger than the parent.' :
+            i === 2 ? 'Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem.' :
+              `This is the answer to question ${i + 1}. It provides detailed explanation of the concept.`
+      }))
       : Array(Math.min(limit, 20)).fill(0).map((_, i) => ({
-          id: i,
-          title: i === 0 ? 'Big-O Notation' :
-                 i === 1 ? 'Binary Search Tree' :
-                 i === 2 ? 'Recursion' :
-                 `Concept ${i + 1}`,
-          important: i < 3,
-          points: i === 0 ? [
-              'Measures algorithm efficiency',
-              'Focuses on worst-case scenario',
-              'Common types: O(1), O(n), O(log n)',
-              'Used in data structures & algorithms'
-            ] : i === 1 ? [
-              'Hierarchical data structure',
-              'Left subtree < parent < right subtree',
-              'Average search time: O(log n)',
-              'Used for efficient searching and sorting'
-            ] : [
-              'Key point 1 about this concept',
-              'Key point 2 with important details',
-              'Key point 3 for better understanding',
-              'Key point 4 to remember'
-            ]
-        }));
-    
+        id: i,
+        title: i === 0 ? 'Big-O Notation' :
+          i === 1 ? 'Binary Search Tree' :
+            i === 2 ? 'Recursion' :
+              `Concept ${i + 1}`,
+        important: i < 3,
+        points: i === 0 ? [
+          'Measures algorithm efficiency',
+          'Focuses on worst-case scenario',
+          'Common types: O(1), O(n), O(log n)',
+          'Used in data structures & algorithms'
+        ] : i === 1 ? [
+          'Hierarchical data structure',
+          'Left subtree < parent < right subtree',
+          'Average search time: O(log n)',
+          'Used for efficient searching and sorting'
+        ] : [
+          'Key point 1 about this concept',
+          'Key point 2 with important details',
+          'Key point 3 for better understanding',
+          'Key point 4 to remember'
+        ]
+      }));
+
     setFlashcards(mockCards);
     setCurrentStep(4);
   };
 
   const nextCard = () => {
-    if(currentCardIndex < flashcards.length - 1) {
+    if (currentCardIndex < flashcards.length - 1) {
       setCurrentCardIndex(currentCardIndex + 1);
       setIsFlipped(false);
       setShowHint(false);
@@ -103,7 +103,7 @@ function FlashCard() {
   };
 
   const prevCard = () => {
-    if(currentCardIndex > 0) {
+    if (currentCardIndex > 0) {
       setCurrentCardIndex(currentCardIndex - 1);
       setIsFlipped(false);
       setShowHint(false);
@@ -115,7 +115,7 @@ function FlashCard() {
 
   const markAsUnderstood = (fromReview = false, cardID = null) => {
     let targetID;
-    if (fromReview){
+    if (fromReview) {
       targetID = cardID;
     } else {
       if (flashcards[currentCardIndex]) {
@@ -139,16 +139,16 @@ function FlashCard() {
       nextCard();
     }
   };
-  
+
   const markForReview = () => {
     let cardID;
-    if(flashcards[currentCardIndex]){
+    if (flashcards[currentCardIndex]) {
       cardID = flashcards[currentCardIndex].id;
     } else {
       cardID = undefined;
     }
 
-    if(!reviewCards.includes(cardID)){
+    if (!reviewCards.includes(cardID)) {
       setReviewCards([...reviewCards, cardID]);
       // TODO: API CALL - Mark card for review
       // Example: saveProgress(cardId, 'review')
@@ -308,8 +308,8 @@ function FlashCard() {
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <label 
-                htmlFor="file-upload" 
+              <label
+                htmlFor="file-upload"
                 className="flex flex-col items-center justify-center p-12 border-[3px] border-dashed border-gray-300 rounded-3xl bg-white cursor-pointer transition-all hover:border-blue-600 hover:bg-blue-50 w-[800px] h-[300px]"
               >
                 <Upload className="w-16 h-16 text-blue-600 mb-4" />
@@ -332,7 +332,7 @@ function FlashCard() {
                 placeholder="Paste your notes here..."
                 className="w-[800px] min-h-[250px] p-6 border-2 border-gray-300 rounded-2xl text-base resize-vertical bg-white text-black focus:outline-none focus:border-blue-600 transition"
               />
-              <button 
+              <button
                 onClick={handleTextGenerate}
                 className="w-[800px] bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center gap-2 hover:shadow-xl transition transform hover:scale-105"
               >
@@ -356,7 +356,7 @@ function FlashCard() {
             </p>
 
             <div className="grid md:grid-cols-2 gap-16 mb-8">
-              <div 
+              <div
                 onClick={() => selectMode('recall')}
                 className="bg-gradient-to-br from-indigo-50 to-blue-200 border-[1px] border-blue-400 rounded-3xl p-10 cursor-pointer text-left transition-all hover:border-blue-600 hover:shadow-2xl hover:-translate-y-2"
               >
@@ -379,7 +379,7 @@ function FlashCard() {
                 </div>
               </div>
 
-              <div 
+              <div
                 onClick={() => selectMode('notes')}
                 className="bg-gradient-to-br from-teal-50 to-cyan-100 border-[1px] border-green-400 rounded-3xl p-10 cursor-pointer text-left transition-all hover:border-green-600 hover:shadow-2xl hover:-translate-y-2"
               >
@@ -403,8 +403,8 @@ function FlashCard() {
               </div>
             </div>
 
-            <button 
-              onClick={resetFlow} 
+            <button
+              onClick={resetFlow}
               className="bg-white border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold inline-flex items-center gap-2 hover:border-gray-500 transition"
             >
               <ArrowLeft size={20} />
@@ -415,12 +415,12 @@ function FlashCard() {
       )}
 
       {/* Step 4: Recall Cards */}
-      {currentStep === 4 && selectedMode === 'recall' && ( 
-        <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8"> 
-          <div className="max-w-3xl w-full"> 
+      {currentStep === 4 && selectedMode === 'recall' && (
+        <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8">
+          <div className="max-w-3xl w-full">
             <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentStep(2)} 
+              <button
+                onClick={() => setCurrentStep(2)}
                 className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition"
               >
                 <ArrowLeft size={20} />
@@ -429,8 +429,8 @@ function FlashCard() {
                 <span className="font-bold text-blue-900">Recall Cards</span>
               </div>
               {reviewCards.length > 0 && (
-                <button 
-                  onClick={goToReviewSection} 
+                <button
+                  onClick={goToReviewSection}
                   className="bg-yellow-100 border-2 border-yellow-400 text-yellow-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-yellow-200 transition"
                 >
                   <RotateCcw size={16} />
@@ -439,7 +439,7 @@ function FlashCard() {
               )}
             </div>
 
-            <div 
+            <div
               onClick={() => !showHint && !showExplanation && setIsFlipped(!isFlipped)}
               className="w-full perspective-1000 cursor-pointer mb-8"
             >
@@ -462,19 +462,18 @@ function FlashCard() {
                       </div>
                       <span className="font-medium">Tap to reveal answer</span>
                     </div>
-                  </div> 
+                  </div>
                   {/* Hint Button - Only on Front */}
                   <div className="flex justify-center">
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         requestHint();
                       }}
-                      className={`absolute bottom-4 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition focus:outline-none ${
-                        showHint 
-                          ? 'bg-yellow-100 border-2 border-yellow-400 text-yellow-800' 
+                      className={`absolute bottom-4 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition focus:outline-none ${showHint
+                          ? 'bg-yellow-100 border-2 border-yellow-400 text-yellow-800'
                           : 'bg-yellow-50 border-2 border-yellow-300 text-yellow-700 hover:bg-yellow-100'
-                      }`}
+                        }`}
                     >
                       <Lightbulb size={20} />
                       {isLoadingHint ? 'Loading...' : showHint ? 'Hide Hint' : 'Need a Hint?'}
@@ -490,27 +489,26 @@ function FlashCard() {
                   <div className="p-10 flex items-center justify-center min-h-[300px]">
                     <p className="text-xl text-gray-800 leading-relaxed">
                       {flashcards[currentCardIndex]?.answer}
-                    </p>       
+                    </p>
                   </div>
-                  <div className="absolute bottom-6 left-0 right-0 flex justify-center"> 
-                    <button 
+                  <div className="absolute bottom-6 left-0 right-0 flex justify-center">
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         requestExplanation();
-                      }}  
-                      className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition ${
-                        showExplanation 
-                          ? 'bg-blue-100 border-2 border-blue-400 text-blue-800' 
+                      }}
+                      className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition ${showExplanation
+                          ? 'bg-blue-100 border-2 border-blue-400 text-blue-800'
                           : 'bg-blue-50 border-2 border-blue-300 text-blue-700 hover:bg-blue-100'
-                      }`}                     
+                        }`}
                     >
                       <MessageSquare size={20} />
                       {isLoadingExplanation ? 'Loading...' : showExplanation ? 'Hide Explanation' : 'Explain'}
                     </button>
-                  </div>           
+                  </div>
                 </div>
               </div>
-            </div>  
+            </div>
 
             {showHint && (
               <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-xl">
@@ -519,7 +517,7 @@ function FlashCard() {
                   <p className="text-base text-gray-800 leading-relaxed">{hintText}</p>
                 </div>
               </div>
-            )}  
+            )}
 
             {showExplanation && (
               <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
@@ -528,19 +526,19 @@ function FlashCard() {
                   <p className="text-base text-gray-800 leading-relaxed">{explanationText}</p>
                 </div>
               </div>
-            )}        
+            )}
 
             {isFlipped && !showHint && !showExplanation && (
               <div className="flex gap-4 mb-8">
-                <button  
-                  onClick={markForReview} 
+                <button
+                  onClick={markForReview}
                   className="flex-1 py-4 rounded-xl text-lg font-semibold border-2 border-yellow-400 flex items-center justify-center gap-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition"
                 >
                   <AlertCircle size={20} />
                   Review Again
                 </button>
-                <button 
-                  onClick={() => markAsUnderstood(false)} 
+                <button
+                  onClick={() => markAsUnderstood(false)}
                   className="flex-1 py-4 rounded-xl text-lg font-semibold border-2 border-green-400 flex items-center justify-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 transition"
                 >
                   <CheckCircle size={20} />
@@ -550,17 +548,17 @@ function FlashCard() {
             )}
 
             <div className="flex gap-4 mb-6">
-              <button 
-                onClick={prevCard} 
-                disabled={currentCardIndex === 0} 
+              <button
+                onClick={prevCard}
+                disabled={currentCardIndex === 0}
                 className="flex-1 py-3 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 flex items-center justify-center gap-2 hover:border-blue-600 hover:text-blue-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <ArrowLeft size={20} />
                 Previous
               </button>
-              <button 
-                onClick={nextCard} 
-                disabled={currentCardIndex === flashcards.length - 1} 
+              <button
+                onClick={nextCard}
+                disabled={currentCardIndex === flashcards.length - 1}
                 className="flex-1 py-3 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 flex items-center justify-center gap-2 hover:border-blue-600 hover:text-blue-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
@@ -569,7 +567,7 @@ function FlashCard() {
             </div>
 
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 transition-all duration-300"
                 style={{ width: `${((currentCardIndex + 1) / flashcards.length) * 100}%` }}
               ></div>
@@ -588,8 +586,8 @@ function FlashCard() {
         <div className="flex justify-center items-start min-h-[calc(100vh-5rem)] p-8">
           <div className="max-w-4xl w-full">
             <div className="flex items-center justify-between mb-8">
-              <button 
-                onClick={() => setCurrentStep(4)} 
+              <button
+                onClick={() => setCurrentStep(4)}
                 className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition"
               >
                 <ArrowLeft size={20} />
@@ -607,8 +605,8 @@ function FlashCard() {
                 <p className="text-lg text-gray-600 mb-8">
                   You have no cards marked for review.
                 </p>
-                <button 
-                  onClick={() => setCurrentStep(4)} 
+                <button
+                  onClick={() => setCurrentStep(4)}
                   className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition transform hover:scale-105"
                 >
                   Back to Study
@@ -648,8 +646,8 @@ function FlashCard() {
                         </div>
                       </div>
                       <div className="flex gap-3 mt-6">
-                        <button 
-                          onClick={() => markAsUnderstood(true, cardId)} 
+                        <button
+                          onClick={() => markAsUnderstood(true, cardId)}
                           className="flex-1 py-3 rounded-xl font-semibold border-2 border-green-400 flex items-center justify-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 transition"
                         >
                           <CheckCircle size={20} />
