@@ -5,6 +5,8 @@ import styles from './FlashStyles.module.css';
 function FlashCard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [showWithFile, setShowWithFile] = useState(false);
+  const [inputText, setInputText] = useState('');
   const [selectedMode, setSelectedMode] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -22,18 +24,14 @@ function FlashCard() {
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setUploadedFile(file);
-      setIsProcessing(true);
-      // TODO: API CALL - Upload file
-      setTimeout(() => {
-        setIsProcessing(false);
-        setCurrentStep(1);
-      }, 2000);
-    }
-  }
+    if (!file) return;
 
-  const handleTextGenerate = () => {
+    setUploadedFile(file);
+    setShowWithFile(true);
+
+  };
+
+  const handleGenerate = () => {
     setIsProcessing(true);
     // TODO: API CALL - Process text
     setTimeout(() => {
@@ -261,6 +259,22 @@ function FlashCard() {
     alert('Generate Quiz - API integration pending');
   };
 
+  const removeFile = () => {
+    setUploadedFile(null);
+    setShowWithFile(false);
+
+    const fileInput = document.getElementById('file-upload');
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
+  const wordCount = inputText.trim().split(/\s+/).filter(Boolean).length;
+
+  const canGenerate =
+    uploadedFile ||
+    (inputText.trim().length > 0 && wordCount >= 100);
+
   return (
     <div className={styles.container}>
       {/* Processing */}
@@ -283,66 +297,118 @@ function FlashCard() {
         </div>
       )}
 
-      {/* Step 1 - upload*/}
+
+      {/* Step 1 - Upload */}
       {currentStep === 1 && (
-        <div className="flex justify-center items-center p-8 ">
+        <div className="flex justify-center items-center p-8">
           <div className="max-w-3xl w-full">
-            <div className="text-center mb-12">
+
+            {/* Header */}
+            <div className="text-center mb-10">
               <Sparkles className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3">
                 Upload your study material
               </h1>
-              <p className="text-xl text-gray-600 mb-2 font-medium">
-                PDF • Text • Notes
-              </p>
-              <p className="text-base text-gray-500">
-                Study Pal will extract key concepts automatically
+              <p className="text-lg text-gray-600">
+                PDF • Text • Notes — StudyPal extracts key concepts automatically
               </p>
             </div>
 
+            {/* File Preview */}
+            {uploadedFile && (
+              <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-2xl flex items-center justify-between animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{uploadedFile.name}</p>
+                    <p className="text-sm text-gray-600">
+                      {(uploadedFile.size / 1024).toFixed(2)} KB
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={removeFile}
+                  className="w-8 h-8 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center text-red-600 font-bold text-xl"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+
+            {/* Upload Box */}
             <div className="mb-8">
               <input
                 type="file"
                 id="file-upload"
-                accept=".pdf,.txt,.doc,.docx"
+                accept=".pdf,.txt,.docx"
                 onChange={handleFileUpload}
                 className="hidden"
+                disabled={inputText.trim().length > 0}
               />
+
               <label
                 htmlFor="file-upload"
-                className="flex flex-col items-center justify-center p-12 border-[3px] border-dashed border-gray-300 rounded-3xl bg-white cursor-pointer transition-all hover:border-blue-600 hover:bg-blue-50 w-[800px] h-[300px]"
+                className={`flex flex-col items-center justify-center p-12 border-[3px] border-dashed rounded-3xl transition-all
+            ${uploadedFile
+                    ? 'border-gray-300 bg-gray-100 opacity-50 cursor-not-allowed'
+                    : 'border-gray-300 bg-white cursor-pointer hover:border-blue-600 hover:bg-blue-50'}
+          `}
               >
                 <Upload className="w-16 h-16 text-blue-600 mb-4" />
-                <span className="text-lg font-semibold text-gray-700 mb-2">
-                  Click to upload or drag and drop
+                <span className="text-lg font-semibold text-gray-700">
+                  Click to upload or drag & drop
                 </span>
-                <span className="text-base text-gray-500">
+                <span className="text-sm text-gray-500">
                   PDF, TXT, DOC (Max 10MB)
                 </span>
               </label>
             </div>
 
-            <div className="text-center my-8 relative left-5">
+            {/* OR Divider */}
+            <div className="text-center my-6 relative">
               <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-300"></div>
-              <span className="bg-[image:var(--gradient-primary)] px-4 text-gray-500 font-medium relative">OR</span>
+              <span className="bg-white px-4 text-gray-500 relative font-medium">
+                OR
+              </span>
             </div>
 
-            <div className="flex flex-col gap-5">
-              <textarea
-                placeholder="Paste your notes here..."
-                className="w-[800px] min-h-[250px] p-6 border-2 border-gray-300 rounded-2xl text-base resize-vertical bg-white text-black focus:outline-none focus:border-blue-600 transition"
-              />
-              <button
-                onClick={handleTextGenerate}
-                className="w-[800px] bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center gap-2 hover:shadow-xl transition transform hover:scale-105"
-              >
-                Generate Flashcards
-                <ArrowRight size={20} />
-              </button>
-            </div>
+            {/* Text Input */}
+            <textarea
+              placeholder={
+                uploadedFile
+                  ? 'Text input disabled — remove file to type notes'
+                  : 'Paste your notes here (minimum 100 words)'
+              }
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              disabled={!!uploadedFile}
+              className={`w-full min-h-[220px] p-6 border-2 rounded-2xl text-base resize-vertical transition mb-6
+    ${uploadedFile
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                  : 'bg-white text-black border-gray-300 focus:border-blue-600'}
+            `}
+            />
+
+            {/* Generate Button */}
+            <button
+              onClick={handleGenerate}
+              disabled={!canGenerate}
+              className={`w-full px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center gap-2 transition
+          ${canGenerate
+                  ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:shadow-xl hover:scale-105'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+        `}
+            >
+              Generate Flashcards
+              <ArrowRight size={20} />
+            </button>
+
           </div>
         </div>
       )}
+
 
       {/* Step 2: Mode Selection */}
       {currentStep === 2 && (
@@ -471,8 +537,8 @@ function FlashCard() {
                         requestHint();
                       }}
                       className={`absolute bottom-4 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition focus:outline-none ${showHint
-                          ? 'bg-yellow-100 border-2 border-yellow-400 text-yellow-800'
-                          : 'bg-yellow-50 border-2 border-yellow-300 text-yellow-700 hover:bg-yellow-100'
+                        ? 'bg-yellow-100 border-2 border-yellow-400 text-yellow-800'
+                        : 'bg-yellow-50 border-2 border-yellow-300 text-yellow-700 hover:bg-yellow-100'
                         }`}
                     >
                       <Lightbulb size={20} />
@@ -498,8 +564,8 @@ function FlashCard() {
                         requestExplanation();
                       }}
                       className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition ${showExplanation
-                          ? 'bg-blue-100 border-2 border-blue-400 text-blue-800'
-                          : 'bg-blue-50 border-2 border-blue-300 text-blue-700 hover:bg-blue-100'
+                        ? 'bg-blue-100 border-2 border-blue-400 text-blue-800'
+                        : 'bg-blue-50 border-2 border-blue-300 text-blue-700 hover:bg-blue-100'
                         }`}
                     >
                       <MessageSquare size={20} />
