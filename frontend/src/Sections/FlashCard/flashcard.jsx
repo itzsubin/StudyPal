@@ -3,6 +3,7 @@ import { Upload, FileText, Brain, BookOpen, CheckCircle, AlertCircle, ArrowRight
 import styles from './FlashStyles.module.css';
 
 function FlashCard() {
+
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [showWithFile, setShowWithFile] = useState(false);
@@ -31,13 +32,53 @@ function FlashCard() {
 
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setIsProcessing(true);
-    // TODO: API CALL - Process text
-    setTimeout(() => {
+
+    try {
+      let response;
+
+      if (uploadedFile) {
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+
+        response = await fetch('http://localhost:8787/upload', {
+          method: 'POST',
+          body: formData,
+        });
+      } else {
+        response = await fetch('http://localhost:8787/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: inputText }),
+        });
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process content');
+      }
+
+      if (!uploadedFile) {
+        setInputText(data.text);
+      }
+
+      console.log('--- EXTRACTED TEXT ---', data.text);
+
+      // Artificial delay for better UX 
+      setTimeout(() => {
+        setIsProcessing(false);
+        setCurrentStep(2);
+      }, 500);
+
+    } catch (error) {
+      console.error('Generation error:', error);
+      alert(error.message); // Simple error feedback
       setIsProcessing(false);
-      setCurrentStep(2);
-    }, 2000);
+    }
   };
 
   const selectMode = (mode) => {
@@ -65,7 +106,7 @@ function FlashCard() {
         title: i === 0 ? 'Big-O Notation' :
           i === 1 ? 'Binary Search Tree' :
             i === 2 ? 'Recursion' :
-              `Concept ${i + 1}`,
+              `Concept ${i + 1} `,
         important: i < 3,
         points: i === 0 ? [
           'Measures algorithm efficiency',
@@ -342,7 +383,7 @@ function FlashCard() {
               <input
                 type="file"
                 id="file-upload"
-                accept=".pdf,.txt,.docx"
+                accept=".pdf"
                 onChange={handleFileUpload}
                 className="hidden"
                 disabled={inputText.trim().length > 0}
@@ -361,7 +402,7 @@ function FlashCard() {
                   Click to upload or drag & drop
                 </span>
                 <span className="text-sm text-gray-500">
-                  PDF, TXT, DOC (Max 10MB)
+                  PDF (Max 10MB)
                 </span>
               </label>
             </div>

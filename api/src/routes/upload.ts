@@ -1,5 +1,6 @@
-import { Hono } from 'hono'
-import { extractTextFromPDF } from '../services/file.service'
+import { Hono } from 'hono';
+import { extractTextFromPDF } from '../services/file.service';
+import { validateContent } from '../services/content.service';
 
 type Bindings = {
   MISTRAL_API_KEY: string
@@ -21,10 +22,24 @@ upload.post('/', async (c) => {
         return c.json({ error: 'No text provided' }, 400)
       }
 
+      const apiKey = c.env.MISTRAL_API_KEY
+      if (!apiKey) {
+        throw new Error('MISTRAL_API_KEY is not configured')
+      }
+
+      const validation = await validateContent(text, apiKey)
+      if (!validation.isValid) {
+        return c.json({
+          error: validation.error || 'Invalid content',
+          warning: true
+        }, 400)
+      }
+      console.log('Valid text uploaded')
       return c.json({
         text,
         source: 'text'
       })
+      console.log('Invalid text uploaded')
     }
 
     // Case 2: for uploaded file
@@ -41,7 +56,7 @@ upload.post('/', async (c) => {
         return c.json({ error: 'Only PDF files are supported' }, 400)
       }
 
-        if (file.size > 50 * 1024 * 1024) { // 50MB limit
+      if (file.size > 50 * 1024 * 1024) { // 50MB limit
         return c.json({ error: 'File too large. Maximum size is 50MB' }, 413)
       }
 
@@ -55,16 +70,25 @@ upload.post('/', async (c) => {
 
       const extractedText = await extractTextFromPDF(buffer, apiKey)
 
+      const validation = await validateContent(extractedText, apiKey)
+      if (!validation.isValid) {
+        return c.json({
+          error: validation.error || 'Invalid content',
+          warning: true
+        }, 400)
+      }
+
       return c.json({
         text: extractedText,
         source: 'pdf'
       })
     }
 
+    console.log('Unsupported content type')
     return c.json({ error: 'Unsupported content type' }, 415)
   } catch (error) {
     console.error('Upload error:', error)
-    return c.json({ 
+    return c.json({
       error: 'Failed to process upload',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, 500)

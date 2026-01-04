@@ -1,33 +1,38 @@
+import { Mistral } from '@mistralai/mistralai'
+
 type MistralOCRResponse = {
-    text?: string
+    pages: {
+        markdown: string
+    }[]
 }
 
 export async function extractTextFromPDF(
     pdfBuffer: ArrayBuffer,
     apiKey: string
 ): Promise<string> {
+    const client = new Mistral({ apiKey })
 
-    const formData = new FormData()
-    formData.append(
-        'file',
-        new Blob([pdfBuffer], { type: 'application/pdf' }),
-        'document.pdf'
+    // Convert ArrayBuffer to Base64
+    const base64String = btoa(
+        new Uint8Array(pdfBuffer)
+            .reduce((data, byte) => data + String.fromCharCode(byte), '')
     )
+    const dataUri = `data:application/pdf;base64,${base64String}`
 
-    const response = await fetch('https://api.mistral.ai/v1/ocr', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: formData
-    })
+    try {
+        const ocrResponse = await client.ocr.process({
+            model: "mistral-ocr-latest",
+            document: {
+                type: "document_url",
+                documentUrl: dataUri
+            },
+            includeImageBase64: false
+        })
 
-    if (!response.ok) {
-        const errText = await response.text()
-        throw new Error(`OCR failed: ${response.status} - ${errText}`)
+        // Combine markdown from all pages
+        return ocrResponse.pages.map(page => page.markdown).join('\n\n')
+    } catch (error) {
+        console.error('Mistral OCR Error:', error)
+        throw new Error(`OCR failed: ${error instanceof Error ? error.message : String(error)}`)
     }
-
-    const data = (await response.json()) as MistralOCRResponse
-    // Mistral returns extracted text here
-    return data.text ?? ''
 }
