@@ -1,8 +1,50 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Brain, BookOpen, CheckCircle, AlertCircle, ArrowRight, ArrowLeft, Sparkles, BrainCircuit, StickyNote, NotebookText, RefreshCw, Zap, CopyCheck, NotebookPen, RotateCcw, Layers, Lightbulb, MessageSquare } from 'lucide-react';
+import {
+  Upload,
+  FileText,
+  RotateCcw,
+  Sparkles,
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle,
+  AlertCircle,
+  Lightbulb,
+  MessageSquare,
+  Layers,
+  NotebookPen
+} from 'lucide-react';
 import styles from './FlashStyles.module.css';
 
-function FlashCard() {
+const FormattedText = ({ text }) => {
+  if (!text) return null;
+
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+
+  return (
+    <p className="text-base text-gray-800 leading-relaxed">
+      {parts.map((part, index) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          const content = part.slice(2, -2);
+
+          // Special handling for "Explanation:" label - just bold, no highlight
+          if (content.trim().replace(/:$/, '').toLowerCase() === 'explanation') {
+            return <strong key={index} className="font-bold text-gray-900">{content}</strong>;
+          }
+
+          // Highlight other bolded terms
+          return (
+            <span key={index} className="font-semibold bg-yellow-200 text-gray-900 px-1 rounded mx-0.5">
+              {content}
+            </span>
+          );
+        }
+        return <span key={index}>{part}</span>;
+      })}
+    </p>
+  );
+};
+
+const FlashCard = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -10,6 +52,11 @@ function FlashCard() {
   const [inputText, setInputText] = useState('');
   const [selectedMode, setSelectedMode] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
+
+  // Connect to API and check health on mount
+  React.useEffect(() => {
+    checkConnection();
+  }, []);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [understood, setUnderstood] = useState([]);
@@ -22,6 +69,9 @@ function FlashCard() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
   const [explanationText, setExplanationText] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState(null); // 'checking', 'online', 'offline'
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [extractedText, setExtractedText] = useState('');
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -62,13 +112,17 @@ function FlashCard() {
         throw new Error(data.error || 'Failed to process content');
       }
 
-      if (!uploadedFile) {
-        setInputText(data.text);
+      if (data.text) {
+        if (uploadedFile) {
+          setExtractedText(data.text);
+        } else {
+          setInputText(data.text);
+        }
       }
 
       console.log('--- EXTRACTED TEXT ---', data.text);
 
-      // Artificial delay for better UX 
+      // Delay for better UX 
       setTimeout(() => {
         setIsProcessing(false);
         setCurrentStep(2);
@@ -76,58 +130,60 @@ function FlashCard() {
 
     } catch (error) {
       console.error('Generation error:', error);
-      alert(error.message); // Simple error feedback
+      alert(error.message);
       setIsProcessing(false);
     }
   };
 
-  const selectMode = (mode) => {
+  const selectMode = async (mode) => {
     setSelectedMode(mode);
 
     const limit = mode === 'recall' ? 15 : 20;
     setCardLimit(limit);
 
-    // TODO: API CALL - Request flashcards with limit
+    if (mode === 'recall') {
+      setIsProcessing(true);
+      try {
+        const response = await fetch('http://localhost:8787/recall', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: uploadedFile ? extractedText : inputText,
+            limit: limit
+          }),
+        });
 
-    const mockCards = mode === 'recall'
-      ? Array(limit).fill(0).map((_, i) => ({
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to generate recall cards');
+        }
+
+        setFlashcards(data);
+        setCurrentStep(4);
+      } catch (error) {
+        console.error("Error fetching recall cards:", error);
+        if (error.message.includes('429') || error.message.toLowerCase().includes('quota')) {
+          alert("Quota Exceeded. Please wait about a minute and try again, or check your API usage at ai.google.dev.");
+        } else {
+          alert("Failed to generate cards: " + error.message);
+        }
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      // Mock data for notes mode (not implemented yet)
+      const mockNotes = Array(Math.min(limit, 20)).fill(0).map((_, i) => ({
         id: i,
-        question: i === 0 ? 'What is Big-O Notation?' :
-          i === 1 ? 'What is a Binary Search Tree?' :
-            i === 2 ? 'What is Recursion?' :
-              `Sample Question ${i + 1}?`,
-        answer: i === 0 ? 'Big-O notation describes the time or space complexity of an algorithm as input size grows. It helps developers understand how their code performs with larger datasets.' :
-          i === 1 ? 'A Binary Search Tree is a data structure where each node has at most two children, with left child smaller and right child larger than the parent.' :
-            i === 2 ? 'Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem.' :
-              `This is the answer to question ${i + 1}. It provides detailed explanation of the concept.`
-      }))
-      : Array(Math.min(limit, 20)).fill(0).map((_, i) => ({
-        id: i,
-        title: i === 0 ? 'Big-O Notation' :
-          i === 1 ? 'Binary Search Tree' :
-            i === 2 ? 'Recursion' :
-              `Concept ${i + 1} `,
-        important: i < 3,
-        points: i === 0 ? [
-          'Measures algorithm efficiency',
-          'Focuses on worst-case scenario',
-          'Common types: O(1), O(n), O(log n)',
-          'Used in data structures & algorithms'
-        ] : i === 1 ? [
-          'Hierarchical data structure',
-          'Left subtree < parent < right subtree',
-          'Average search time: O(log n)',
-          'Used for efficient searching and sorting'
-        ] : [
-          'Key point 1 about this concept',
-          'Key point 2 with important details',
-          'Key point 3 for better understanding',
-          'Key point 4 to remember'
-        ]
+        title: `Concept ${i + 1}`,
+        points: ['Point 1', 'Point 2', 'Point 3']
       }));
-
-    setFlashcards(mockCards);
-    setCurrentStep(4);
+      setFlashcards(mockNotes); // Or handle notes differently
+      // For now, only recall is implemented fully
+      alert("Smart Notes generation is coming soon!");
+    }
   };
 
   const nextCard = () => {
@@ -217,7 +273,7 @@ function FlashCard() {
     return flashcards.find(card => card.id === cardId);
   };
 
-  const requestHint = () => {
+  const requestHint = async () => {
     if (showHint) {
       setShowHint(false);
       return;
@@ -226,36 +282,50 @@ function FlashCard() {
     setIsLoadingHint(true);
     setShowHint(true);
 
-    // TODO: API CALL - Request AI-generated hint
-    // This should send the current question to your backend AI service
-    // Example:
-    // fetch('/api/flashcards/hint', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     question: flashcards[currentCardIndex].question,
-    //     cardId: flashcards[currentCardIndex].id
-    //   })
-    // })
-    // .then(res => res.json())
-    // .then(data => {
-    //   setHintText(data.hint);
-    //   setIsLoadingHint(false);
-    // })
+    try {
+      const response = await fetch('http://localhost:8787/recall/hint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: flashcards[currentCardIndex].question
+        })
+      });
 
-    // Mock AI hint generation
-    setTimeout(() => {
-      const mockHints = {
-        0: 'If you have a list of n items and you need to check every single one of them to find a specific number, how many "steps" or operations does the computer perform? Does that number stay the same if the list grows to a million items?',
-        1: 'Think about major Australian cities. This city was chosen as a compromise between the two largest cities in the country.',
-        default: 'Think about the key concepts related to this question. What are the main components or factors involved?'
-      };
-      setHintText(mockHints[currentCardIndex] || mockHints.default);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate hint');
+      }
+
+      setHintText(data.hint);
+    } catch (error) {
+      console.error("Hint error:", error);
+      setHintText("Sorry, I couldn't generate a hint right now. Please try again.");
+    } finally {
       setIsLoadingHint(false);
-    }, 1000);
+    }
   };
 
-  const requestExplanation = () => {
+  const checkConnection = async () => {
+    setIsTestingConnection(true);
+    setConnectionStatus('checking');
+    try {
+      const response = await fetch('http://localhost:8787/health');
+      const data = await response.json();
+      if (response.ok && data.healthy) {
+        setConnectionStatus('online');
+      } else {
+        setConnectionStatus('offline');
+      }
+    } catch (error) {
+      console.error("Connection test failed:", error);
+      setConnectionStatus('offline');
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
+  const requestExplanation = async () => {
     if (showExplanation) {
       setShowExplanation(false);
       return;
@@ -264,34 +334,30 @@ function FlashCard() {
     setIsLoadingExplanation(true);
     setShowExplanation(true);
 
-    // TODO: API CALL - Request AI-generated explanation
-    // This should send the question and answer to your backend AI service
-    // Example:
-    // fetch('/api/flashcards/explain', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     question: flashcards[currentCardIndex].question,
-    //     answer: flashcards[currentCardIndex].answer,
-    //     cardId: flashcards[currentCardIndex].id
-    //   })
-    // })
-    // .then(res => res.json())
-    // .then(data => {
-    //   setExplanationText(data.explanation);
-    //   setIsLoadingExplanation(false);
-    // })
+    try {
+      const response = await fetch('http://localhost:8787/recall/explain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: flashcards[currentCardIndex].question,
+          answer: flashcards[currentCardIndex].answer,
+          context: uploadedFile ? extractedText : inputText // Pass the appropriate context
+        })
+      });
 
-    // Mock AI explanation generation
-    setTimeout(() => {
-      const mockExplanations = {
-        0: 'Time complexity helps us understand how efficient an algorithm is. For example, if an algorithm checks every item in a list (O(n)), doubling the list size doubles the time needed. This is different from O(1) which takes constant time regardless of input size.',
-        1: 'Canberra was chosen as a compromise between Sydney and Melbourne, Australia\'s two largest cities. Both wanted to be the capital, so a new city was planned and built between them in 1908.',
-        default: 'This concept is fundamental to understanding the topic. It builds on previous knowledge and connects to related ideas in the subject.'
-      };
-      setExplanationText(mockExplanations[currentCardIndex] || mockExplanations.default);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate explanation');
+      }
+
+      setExplanationText(data.explanation);
+    } catch (error) {
+      console.error("Explanation error:", error);
+      setExplanationText("Sorry, I couldn't generate an explanation right now. Please try again.");
+    } finally {
       setIsLoadingExplanation(false);
-    }, 1000);
+    }
   };
 
   const generateQuiz = () => {
@@ -302,6 +368,7 @@ function FlashCard() {
 
   const removeFile = () => {
     setUploadedFile(null);
+    setExtractedText('');
     setShowWithFile(false);
 
     const fileInput = document.getElementById('file-upload');
@@ -353,17 +420,47 @@ function FlashCard() {
               <p className="text-lg text-gray-600">
                 PDF • Text • Notes — StudyPal extracts key concepts automatically
               </p>
+
+              <div className="mt-4 flex flex-col items-center gap-2">
+                <button
+                  onClick={checkConnection}
+                  disabled={isTestingConnection}
+                  className={`text-xs font-semibold px-4 py-2 rounded-full border shadow-sm transition-all flex items-center gap-2 hover:scale-105 active:scale-95
+                    ${connectionStatus === 'online' ? 'bg-green-50 border-green-200 text-green-700' :
+                      connectionStatus === 'offline' ? 'bg-red-50 border-red-200 text-red-700' :
+                        'bg-blue-50 border-blue-200 text-blue-700'}
+                  `}
+                >
+                  <div className={`w-2.5 h-2.5 rounded-full ${connectionStatus === 'online' ? 'bg-green-500 animate-pulse' :
+                    connectionStatus === 'offline' ? 'bg-red-500' :
+                      'bg-blue-400 animate-bounce'
+                    }`} />
+                  {isTestingConnection ? 'Checking Connection...' :
+                    connectionStatus === 'online' ? 'API Connected & Ready' :
+                      connectionStatus === 'offline' ? 'API Connection Failed' :
+                        'Test API Connection'}
+                </button>
+              </div>
             </div>
 
             {/* File Preview */}
             {uploadedFile && (
               <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-2xl flex items-center justify-between animate-fadeIn">
-                <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => {
+                    if (uploadedFile) {
+                      const fileURL = URL.createObjectURL(uploadedFile);
+                      window.open(fileURL, '_blank');
+                    }
+                  }}
+                  title="Click to preview file"
+                >
                   <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                     <FileText className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{uploadedFile.name}</p>
+                    <p className="font-semibold text-gray-900 underline decoration-blue-300 decoration-2 underline-offset-2">{uploadedFile.name}</p>
                     <p className="text-sm text-gray-600">
                       {(uploadedFile.size / 1024).toFixed(2)} KB
                     </p>
@@ -391,6 +488,35 @@ function FlashCard() {
 
               <label
                 htmlFor="file-upload"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (uploadedFile || inputText.trim().length > 0) return;
+
+                  const files = e.dataTransfer.files;
+                  if (files && files.length > 0) {
+                    const file = files[0];
+                    if (file.type === 'application/pdf') {
+                      // Simulate the event structure expected by handleFileUpload
+                      const mockEvent = { target: { files: [file] } };
+                      handleFileUpload(mockEvent);
+                    } else {
+                      alert("Please upload a PDF file.");
+                    }
+                  }
+                }}
                 className={`flex flex-col items-center justify-center p-12 border-[3px] border-dashed rounded-3xl transition-all
             ${uploadedFile
                     ? 'border-gray-300 bg-gray-100 opacity-50 cursor-not-allowed'
@@ -559,7 +685,7 @@ function FlashCard() {
                       {currentCardIndex + 1} / {flashcards.length}
                     </div>
                   </div>
-                  <div className="p-10 flex flex-col items-center justify-center min-h-[300px]">
+                  <div className="p-10 flex flex-col items-center justify-center min-h-[300px] max-h-[500px] overflow-y-auto custom-scrollbar">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8 leading-snug">
                       {flashcards[currentCardIndex]?.question}
                     </h2>
@@ -593,7 +719,7 @@ function FlashCard() {
                   <div className="bg-gradient-to-r from-green-500 to-teal-600 px-8 py-6 text-white">
                     <div className="text-sm font-semibold opacity-90 mb-1">ANSWER</div>
                   </div>
-                  <div className="p-10 flex items-center justify-center min-h-[300px]">
+                  <div className="p-10 flex items-center justify-center min-h-[300px] max-h-[500px] overflow-y-auto custom-scrollbar">
                     <p className="text-xl text-gray-800 leading-relaxed">
                       {flashcards[currentCardIndex]?.answer}
                     </p>
@@ -630,7 +756,7 @@ function FlashCard() {
               <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
                 <div className="flex items-start gap-3">
                   <MessageSquare className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
-                  <p className="text-base text-gray-800 leading-relaxed">{explanationText}</p>
+                  <FormattedText text={explanationText} />
                 </div>
               </div>
             )}
@@ -770,7 +896,7 @@ function FlashCard() {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .perspective-1000 {
           perspective: 1000px;
         }
@@ -795,6 +921,7 @@ function FlashCard() {
         .delay-200 {
           animation-delay: 0.2s;
         }
+
       `}</style>
     </div>
   );
