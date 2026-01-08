@@ -20,7 +20,8 @@ export async function generateHint(
             },
             body: JSON.stringify({
                 "model": "xiaomi/mimo-v2-flash:free",
-                "messages": [{ "role": "user", "content": prompt }]
+                "messages": [{ "role": "user", "content": prompt }],
+                "reasoning": { "enabled": false }
             })
         });
 
@@ -59,7 +60,8 @@ export async function generateExplanation(
             },
             body: JSON.stringify({
                 "model": "xiaomi/mimo-v2-flash:free",
-                "messages": [{ "role": "user", "content": prompt }]
+                "messages": [{ "role": "user", "content": prompt }],
+                "reasoning": { "enabled": false }
             })
         });
 
