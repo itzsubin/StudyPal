@@ -14,6 +14,7 @@ import {
   NotebookPen
 } from 'lucide-react';
 import styles from './FlashStyles.module.css';
+import SmartNote from './Smart Notes/smartnote';
 
 const FormattedText = ({ text }) => {
   if (!text) return null;
@@ -85,6 +86,14 @@ const FlashCard = () => {
   const handleGenerate = async () => {
     setIsProcessing(true);
 
+    // MOCK: API disabled for frontend development
+    setTimeout(() => {
+      setExtractedText(inputText || "Mock extracted text from file...");
+      setIsProcessing(false);
+      setCurrentStep(2);
+    }, 1000);
+
+    /*
     try {
       let response;
 
@@ -133,6 +142,7 @@ const FlashCard = () => {
       alert(error.message);
       setIsProcessing(false);
     }
+    */
   };
 
   const selectMode = async (mode) => {
@@ -143,6 +153,19 @@ const FlashCard = () => {
 
     if (mode === 'recall') {
       setIsProcessing(true);
+
+      // MOCK: API disabled
+      setTimeout(() => {
+        setFlashcards([
+          { id: 1, question: "Mock Q1: What is the main goal?", answer: "To verify frontend without backend." },
+          { id: 2, question: "Mock Q2: Is the API active?", answer: "No, it is currently mocked." },
+          { id: 3, question: "Mock Q3: Can I edit UI?", answer: "Yes, fully independent of server." }
+        ]);
+        setCurrentStep(4);
+        setIsProcessing(false);
+      }, 1000);
+
+      /*
       try {
         const response = await fetch('http://localhost:8787/recall', {
           method: 'POST',
@@ -173,16 +196,16 @@ const FlashCard = () => {
       } finally {
         setIsProcessing(false);
       }
-    } else {
-      // Mock data for notes mode (not implemented yet)
-      const mockNotes = Array(Math.min(limit, 20)).fill(0).map((_, i) => ({
-        id: i,
-        title: `Concept ${i + 1}`,
-        points: ['Point 1', 'Point 2', 'Point 3']
-      }));
-      setFlashcards(mockNotes); // Or handle notes differently
-      // For now, only recall is implemented fully
-      alert("Smart Notes generation is coming soon!");
+      */
+    } else if (mode === 'notes') {
+      // Mock flow for Smart Notes UI development
+      setIsProcessing(true);
+
+      // Simulate processing time
+      setTimeout(() => {
+        setIsProcessing(false);
+        setCurrentStep(4);
+      }, 800);
     }
   };
 
@@ -282,6 +305,13 @@ const FlashCard = () => {
     setIsLoadingHint(true);
     setShowHint(true);
 
+    // MOCK: API disabled
+    setTimeout(() => {
+      setHintText("This is a mock hint. Backend is disabled.");
+      setIsLoadingHint(false);
+    }, 500);
+
+    /*
     try {
       const response = await fetch('http://localhost:8787/recall/hint', {
         method: 'POST',
@@ -304,9 +334,14 @@ const FlashCard = () => {
     } finally {
       setIsLoadingHint(false);
     }
+    */
   };
 
   const checkConnection = async () => {
+    // MOCK: API disabled for frontend development
+    setConnectionStatus('online');
+    setIsTestingConnection(false);
+    /*
     setIsTestingConnection(true);
     setConnectionStatus('checking');
     try {
@@ -323,6 +358,7 @@ const FlashCard = () => {
     } finally {
       setIsTestingConnection(false);
     }
+    */
   };
 
   const requestExplanation = async () => {
@@ -334,6 +370,13 @@ const FlashCard = () => {
     setIsLoadingExplanation(true);
     setShowExplanation(true);
 
+    // MOCK: API disabled
+    setTimeout(() => {
+      setExplanationText("This is a mock explanation. Backend is disabled.");
+      setIsLoadingExplanation(false);
+    }, 500);
+
+    /*
     try {
       const response = await fetch('http://localhost:8787/recall/explain', {
         method: 'POST',
@@ -358,6 +401,7 @@ const FlashCard = () => {
     } finally {
       setIsLoadingExplanation(false);
     }
+    */
   };
 
   const generateQuiz = () => {
@@ -405,6 +449,15 @@ const FlashCard = () => {
         </div>
       )}
 
+
+      {/* Step 4: Smart Notes */}
+      {currentStep === 4 && selectedMode === 'notes' && (
+        <SmartNote
+          onBack={resetFlow}
+          extractedText={extractedText}
+          fileName={uploadedFile?.name}
+        />
+      )}
 
       {/* Step 1 - Upload */}
       {currentStep === 1 && (
@@ -561,7 +614,7 @@ const FlashCard = () => {
             {/* Generate Button */}
             <button
               onClick={handleGenerate}
-              disabled={!canGenerate}
+              disabled={canGenerate}
               className={`w-full px-8 py-4 rounded-xl text-lg font-semibold flex items-center justify-center gap-2 transition
           ${canGenerate
                   ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:shadow-xl hover:scale-105'
@@ -893,6 +946,10 @@ const FlashCard = () => {
               </div>
             )}
           </div>
+
+          {currentStep === 5 && selectMode === 'smart' && (
+            <SmartNote />
+          )}
         </div>
       )}
 

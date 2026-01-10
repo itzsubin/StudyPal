@@ -7,14 +7,14 @@ function Home() {
   return (
     <section id='home' className={styles.container}>
       <div className={styles.grade}>
-        <img 
+        <img
           src={A}
           alt="Grade decoration"
           className={styles.A}
         />
       </div>
       <div className={styles.arrow}>
-        <img 
+        <img
           src={arrow}
           alt="Arrow decoration"
           className={styles.line}
@@ -24,7 +24,7 @@ function Home() {
       <div className="relative z-10 text-center">
         <div className="inline-flex items-center gap-2 bg-white px-4 py-2.5 rounded-full shadow-sm mb-8 md:mb-10 lg:mb-12">
           <span className="text-m font-semibold text-gray-700">
-            Study smarter, one step at a time
+            AI assists. The student decides.
           </span>
         </div>
 
