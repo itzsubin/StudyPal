@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import upload from './routes/upload'
 import recall from './routes/recall'
+import note from './routes/note'
 
 
 type Bindings = {
@@ -35,6 +36,8 @@ app.get('/health', (c) => {
 
 app.route('/upload', upload)
 app.route('/recall', recall)
+app.route('/notes', note)
+
 
 
 export default app

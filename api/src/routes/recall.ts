@@ -26,7 +26,8 @@ recall.post("/", async (c) => {
         return c.json(result);
     } catch (error: any) {
         console.error("Error in recall route:", error);
-        return c.json({ error: error.message || "Failed to generate recall cards" }, 500);
+        const status = error.message.includes('429') ? 429 : 500;
+        return c.json({ error: error.message || "Failed to generate recall cards" }, status);
     }
 });
 
