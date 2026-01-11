@@ -1,75 +1,23 @@
 .container {
-  position: relative;
-  padding-top: 5.5rem;
-  padding-bottom: 5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  background-color: #111827; 
-  width: 100vw;
-  height: 20.8vw;
-  margin-left: calc(-50vw + 50%);
-  overflow: hidden;
-}
-
-.brandcontainer{
      position: relative;
-     left: -625px;
-     bottom: 135px;
-}
-.brandName {
-  font-family: "Poppins", sans-serif;
-  font-size: 2rem;
-  font-weight: bold;
-  background: linear-gradient(90deg, #2563eb, #7c10db, #db2777);
-  background-clip: text;
-  color: transparent;
-  display: inline-block;
-}
-
-.treecontainer{
-     position: relative;
-     top: -176px;
-     left: 35%;
-     z-index: 1;
-     pointer-events: none;
-}
-.tree{
-     width: 430px;
-     height: 320px;
-     opacity: 0.3;
-     filter: blur(0.5px);
-     mix-blend-mode: screen;
+     padding-top: 5.5rem;
+     padding-bottom: 5rem;
+     padding-left: 1rem;
+     padding-right: 1rem;
+     width: 100vw;
+     margin-left: calc(-50vw + 50%);
+     overflow: hidden;
 }
 
 
-.logocontainer{
+.logocontainer {
      margin-left: 60px;
      position: relative;
      bottom: 82px;
 
 }
 
-.logo{
-     width: 80px;
+.logo {
+     width: 200px;
      height: 80px;
-}
-
-.personcontainer{
- position: relative;
- left: 1480px;
- bottom: 630px;
- transform: rotate(-7deg) scale(1.1);
-}
-
-.person{
-     width: 300px;
-     height: 300px;
-}
-.copyright {
-  position: relative;
-  z-index: 10;
-  color: #9ca3af;
-  right: 30px;
-  text-align: center;
-  margin-top: -490px;
 }

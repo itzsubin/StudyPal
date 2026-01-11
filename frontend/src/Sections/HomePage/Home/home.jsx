@@ -13,13 +13,6 @@ function Home() {
           className={styles.A}
         />
       </div>
-      <div className={styles.arrow}>
-        <img
-          src={arrow}
-          alt="Arrow decoration"
-          className={styles.line}
-        />
-      </div>
 
       <div className="relative z-10 text-center">
         <div className="inline-flex items-center gap-2 bg-white px-4 py-2.5 rounded-full shadow-sm mb-8 md:mb-10 lg:mb-12">

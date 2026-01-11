@@ -24,6 +24,12 @@ const FormattedText = ({ text }) => {
             {parts.map((part, index) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     const content = part.slice(2, -2);
+
+                    const lowerContent = content.trim().replace(/:$/, '').toLowerCase();
+                    if (lowerContent === 'explanation' || lowerContent === 'hint') {
+                        return <strong key={index} className="font-bold text-gray-900">{content}</strong>;
+                    }
+
                     return (
                         <span key={index} className="font-semibold bg-yellow-200 text-gray-900 px-1 rounded mx-0.5">
                             {content}
@@ -49,15 +55,22 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
     const [editedTitle, setEditedTitle] = useState('');
     const [isEditingContent, setIsEditingContent] = useState(false);
     const [editedContent, setEditedContent] = useState([]);
+    const hasRequested = React.useRef(false);
 
     useEffect(() => {
-        generateSmartNotes();
+        if (!hasRequested.current) {
+            generateSmartNotes();
+            hasRequested.current = true;
+        }
     }, []);
 
     const generateSmartNotes = async () => {
         setIsProcessing(true);
 
-        setTimeout(() => {
+        try {
+            // Simulated delay for UI/UX testing
+            await new Promise(resolve => setTimeout(resolve, 800));
+
             setNotes([
                 {
                     id: 1,
@@ -156,35 +169,27 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
                     content: [
                         {
                             type: "heading",
-                            text: "Why Preprocessing Matters"
+                            text: "Why Preprocess?"
                         },
                         {
                             type: "paragraph",
-                            text: "**Clean data = Better models**. Poor preprocessing is the #1 reason models fail in production."
+                            text: "Real-world data is often incomplete, inconsistent, and noisy. **Preprocessing** is vital for model accuracy."
                         },
                         {
                             type: "heading",
-                            text: "Essential Steps"
+                            text: "Common Techniques"
                         },
                         {
                             type: "bullet",
-                            text: "**Normalization/Standardization**: Scale features to similar ranges (0-1 or mean=0, std=1)"
+                            text: "**Handling Missing Values**: Imputation (mean/median) or removing rows"
                         },
                         {
                             type: "bullet",
-                            text: "**Handle Missing Values**: Use imputation (mean/median/mode) or remove rows strategically"
+                            text: "**Feature Scaling**: Normalization or standardization"
                         },
                         {
                             type: "bullet",
-                            text: "**Train-Test Split**: Always separate data (typically 80/20 or 70/30)"
-                        },
-                        {
-                            type: "bullet",
-                            text: "**Data Augmentation**: Create variations when dataset is small (rotation, flipping for images)"
-                        },
-                        {
-                            type: "heading",
-                            text: "Common Mistake"
+                            text: "**Encoding Categorical Data**: One-hot encoding or label encoding"
                         },
                         {
                             type: "paragraph",
@@ -193,8 +198,18 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
                     ]
                 }
             ]);
+        } catch (error) {
+            console.error("Error generating notes:", error);
+            const errorMsg = error.message.toLowerCase();
+            if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('rate limit')) {
+                alert("Rate Limit Exceeded. OpenRouter's free tier has a limit of 20 requests per minute. Please wait about a minute and try again.");
+            } else {
+                alert("Failed to generate smart notes: " + error.message);
+            }
+            onBack();
+        } finally {
             setIsProcessing(false);
-        }, 1500);
+        }
     };
 
     const nextNote = () => {
@@ -217,16 +232,13 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         }
     };
 
-    const toggleReviewLater = (noteId) => {
-        if (reviewLater.includes(noteId)) {
-            setReviewLater(reviewLater.filter(id => id !== noteId));
+    const toggleReviewLater = () => {
+        const currentNoteId = notes[currentNoteIndex].id;
+        if (reviewLater.includes(currentNoteId)) {
+            setReviewLater(reviewLater.filter(id => id !== currentNoteId));
         } else {
-            setReviewLater([...reviewLater, noteId]);
+            setReviewLater([...reviewLater, currentNoteId]);
         }
-    };
-
-    const removeFromReview = (noteId) => {
-        setReviewLater(reviewLater.filter(id => id !== noteId));
     };
 
     const requestExplanation = async () => {
@@ -238,440 +250,369 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         setIsLoadingExplanation(true);
         setShowExplanation(true);
 
+        // Simulating API call
         setTimeout(() => {
-            setExplanationText("**Extended Context:** This concept builds on fundamental principles you've already learned. The key is to understand how each component interacts with others in the system. **Real-World Application:** In practice, this is used daily by data scientists and ML engineers to improve model performance. Companies like Google, Netflix, and Tesla rely on these principles. **Study Tip:** Try explaining this concept to someone else - teaching is one of the best ways to solidify your understanding.");
+            setExplanationText("This is an **AI-generated explanation** for the current topic. It provides deeper context and clarifies complex terms used in the summary.");
             setIsLoadingExplanation(false);
         }, 800);
     };
 
-    const startEditingTitle = () => {
+    const handleEditTitle = () => {
         setEditedTitle(notes[currentNoteIndex].title);
         setIsEditingTitle(true);
     };
 
-    const saveTitle = () => {
+    const handleSaveTitle = () => {
         const updatedNotes = [...notes];
         updatedNotes[currentNoteIndex].title = editedTitle;
         setNotes(updatedNotes);
         setIsEditingTitle(false);
     };
 
-    const cancelTitleEdit = () => {
-        setIsEditingTitle(false);
-        setEditedTitle('');
-    };
-
-    const startEditingContent = () => {
-        setEditedContent([...notes[currentNoteIndex].content]);
+    const handleEditContent = () => {
+        setEditedContent(JSON.parse(JSON.stringify(notes[currentNoteIndex].content)));
         setIsEditingContent(true);
     };
 
-    const saveContent = () => {
+    const handleSaveContent = () => {
         const updatedNotes = [...notes];
         updatedNotes[currentNoteIndex].content = editedContent;
         setNotes(updatedNotes);
         setIsEditingContent(false);
     };
 
-    const cancelContentEdit = () => {
-        setIsEditingContent(false);
-        setEditedContent([]);
+    const handleContentChange = (index, value) => {
+        const newContent = [...editedContent];
+        newContent[index].text = value;
+        setEditedContent(newContent);
     };
-
-    const updateContentItem = (index, newText) => {
-        const updated = [...editedContent];
-        updated[index].text = newText;
-        setEditedContent(updated);
-    };
-
-    const currentNote = notes[currentNoteIndex];
-    const isInReview = currentNote ? reviewLater.includes(currentNote.id) : false;
 
     if (isProcessing) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
-                <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-md w-full mx-4 text-center">
-                    <div className="w-20 h-20 border-4 border-gray-200 border-t-green-600 rounded-full animate-spin mx-auto mb-6"></div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                        Generating Smart Notes...
-                    </h2>
-                    <p className="text-base text-gray-600 mb-4">
-                        Our AI is condensing your content into structured study material
-                    </p>
-                    <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                        <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce delay-100"></div>
-                        <div className="w-2 h-2 bg-cyan-600 rounded-full animate-bounce delay-200"></div>
+            <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
+                    <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-md w-full mx-4 text-center">
+                        <div className="w-20 h-20 border-4 border-gray-200 border-t-green-600 rounded-full animate-spin mx-auto mb-6"></div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                            Generating Smart Notes...
+                        </h2>
+                        <p className="text-base text-gray-600 mb-4">
+                            Our AI is condensing your content into structured study material
+                        </p>
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                            <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce delay-100"></div>
+                            <div className="w-2 h-2 bg-cyan-600 rounded-full animate-bounce delay-200"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         );
+    }
+
+    if (notes.length === 0) {
+        return null;
     }
 
     if (showReviewSection) {
+        const reviewedNotes = notes.filter(n => reviewLater.includes(n.id));
         return (
-            <div className="flex justify-center items-start min-h-[calc(100vh-5rem)] p-8">
-                <div className="max-w-4xl w-full">
-                    <div className="flex items-center justify-between mb-8">
+            <div className="max-w-4xl w-full mx-auto p-8 animate-fadeIn">
+                <div className="flex items-center justify-between mb-8">
+                    <button
+                        onClick={() => setShowReviewSection(false)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <ArrowLeft className="w-6 h-6 text-gray-600" />
+                    </button>
+                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                        <Flag className="w-6 h-6 text-orange-500" />
+                        Flagged for Review ({reviewedNotes.length})
+                    </h1>
+                    <div className="w-10" />
+                </div>
+
+                {reviewedNotes.length === 0 ? (
+                    <div className="text-center py-20 bg-white rounded-[2rem] border-2 border-dashed border-gray-200 shadow-sm animate-fadeIn max-w-2xl mx-auto">
+                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <CheckCircle className="w-10 h-10 text-green-600" />
+                        </div>
+                        <h2 className="text-3xl font-extrabold text-gray-900 mb-3">All caught up!</h2>
+                        <p className="text-lg text-gray-600 mb-8 px-4">
+                            You've reviewed all your flagged notes. Your knowledge is now more secure than ever!
+                        </p>
                         <button
                             onClick={() => setShowReviewSection(false)}
-                            className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-green-600 hover:text-green-600 transition"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-2xl font-bold hover:shadow-xl hover:scale-105 transition active:scale-95"
                         >
                             <ArrowLeft size={20} />
+                            Back to Study
                         </button>
-                        <h1 className="text-3xl font-bold text-gray-900">Review Later</h1>
-                        <div className="w-10"></div>
                     </div>
-
-                    {reviewLater.length === 0 ? (
-                        <div className="text-center py-20">
-                            <Flag className="w-20 h-20 text-gray-400 mx-auto mb-6" />
-                            <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                                No notes flagged yet
-                            </h2>
-                            <p className="text-lg text-gray-600 mb-8">
-                                Flag important notes to review them later from your dashboard
-                            </p>
-                            <button
-                                onClick={() => setShowReviewSection(false)}
-                                className="bg-gradient-to-r from-green-600 via-teal-600 to-cyan-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition transform hover:scale-105"
-                            >
-                                Back to Notes
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="space-y-6">
-                            <p className="text-lg text-gray-600 mb-6">
-                                You have <span className="font-bold text-orange-700">{reviewLater.length} note(s)</span> flagged for later review.
-                            </p>
-                            <p className="text-sm text-blue-600 bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-                                💡 <strong>Coming Soon:</strong> After you set up authentication, these notes will be saved to your dashboard where you can organize them by topics and create study plans!
-                            </p>
-
-                            {reviewLater.map((noteId) => {
-                                const note = notes.find(n => n.id === noteId);
-                                if (!note) return null;
-
-                                return (
-                                    <div key={noteId} className="bg-white border-2 border-orange-400 rounded-2xl p-8 shadow-lg">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-3">
-                                                    <Flag className="w-5 h-5 text-orange-600" />
-                                                    <h3 className="text-xl font-bold text-gray-900">
-                                                        {note.title}
-                                                    </h3>
-                                                </div>
-                                                <div className="flex flex-wrap gap-2 mb-4">
-                                                    {note.topics.map((topic, idx) => (
-                                                        <span key={idx} className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold border border-green-300">
-                                                            <Tag size={14} />
-                                                            {topic}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <div className="space-y-2">
-                                                    {note.content.map((item, idx) => {
-                                                        if (item.type === 'heading') {
-                                                            return <h4 key={idx} className="font-bold text-gray-900 mt-4 mb-2">{item.text}</h4>;
-                                                        }
-                                                        if (item.type === 'paragraph') {
-                                                            return <p key={idx} className="text-gray-700"><FormattedText text={item.text} /></p>;
-                                                        }
-                                                        if (item.type === 'bullet') {
-                                                            return (
-                                                                <div key={idx} className="flex items-start gap-3">
-                                                                    <span className="text-green-600 text-xl leading-none mt-1">•</span>
-                                                                    <span className="text-gray-700 flex-1"><FormattedText text={item.text} /></span>
-                                                                </div>
-                                                            );
-                                                        }
-                                                        return null;
-                                                    })}
-                                                </div>
-                                            </div>
+                ) : (
+                    <div className="space-y-6">
+                        {reviewedNotes.map(note => (
+                            <div key={note.id} className="bg-white border-2 border-orange-100 rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">{note.title}</h3>
+                                <div className="space-y-3">
+                                    {note.content.map((item, idx) => (
+                                        <div key={idx} className={item.type === 'heading' ? 'font-bold text-gray-800 mt-4' : 'text-gray-600'}>
+                                            {item.type === 'bullet' && '• '}
+                                            <FormattedText text={item.text} />
                                         </div>
-                                        <div className="flex gap-3 mt-6">
-                                            <button
-                                                onClick={() => removeFromReview(noteId)}
-                                                className="flex-1 py-3 rounded-xl font-semibold border-2 border-gray-400 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
-                                            >
-                                                <X size={20} />
-                                                Remove Flag
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         );
     }
+
+    const currentNote = notes[currentNoteIndex];
+    if (!currentNote) return null;
 
     return (
         <div className="flex justify-center items-center min-h-[calc(100vh-5rem)] p-8">
             <div className="max-w-4xl w-full">
+                {/* Header Controls */}
                 <div className="flex items-center justify-between mb-8">
                     <button
                         onClick={onBack}
-                        className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-green-600 hover:text-green-600 transition"
+                        className="bg-white border-2 border-gray-300 w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:border-green-600 hover:text-green-600 transition shadow-sm"
                     >
                         <ArrowLeft size={20} />
                     </button>
 
-                    <div className="bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-200 px-5 py-2 rounded-xl flex items-center gap-2">
-                        <BookOpen className="w-5 h-5 text-green-700" />
-                        <span className="font-bold text-green-900">Smart Notes</span>
-                    </div>
-
-                    {reviewLater.length > 0 && (
-                        <button
-                            onClick={() => setShowReviewSection(true)}
-                            className="bg-orange-100 border-2 border-orange-400 text-orange-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-orange-200 transition"
-                        >
-                            <Flag size={16} />
-                            Review ({reviewLater.length})
-                        </button>
-                    )}
-                </div>
-
-                <div className="bg-white border-2 border-gray-200 rounded-2xl shadow-xl overflow-hidden mb-6">
-                    <div className="bg-gradient-to-r from-green-500 via-teal-500 to-cyan-500 px-8 py-6">
-                        <div className="flex items-center justify-between text-white mb-3">
-                            <div className="flex items-center gap-3">
-                                <Brain className="w-6 h-6" />
-                                <span className="text-sm font-semibold opacity-90">SMART NOTE</span>
-                            </div>
-                            <span className="text-base font-bold">
-                                {currentNoteIndex + 1} / {notes.length}
+                    <div className="flex gap-3">
+                        <div className="bg-green-50 border-2 border-green-200 px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm">
+                            <span className="font-bold text-green-900 flex items-center gap-2">
+                                Smart Notes
                             </span>
                         </div>
+                    </div>
+                </div>
 
-                        {isEditingTitle ? (
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="text"
-                                    value={editedTitle}
-                                    onChange={(e) => setEditedTitle(e.target.value)}
-                                    className="flex-1 px-4 py-2 rounded-lg text-xl font-bold text-gray-900 border-2 border-white focus:outline-none"
-                                    autoFocus
-                                />
-                                <button
-                                    onClick={saveTitle}
-                                    className="p-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition"
-                                >
-                                    <Save size={20} />
-                                </button>
-                                <button
-                                    onClick={cancelTitleEdit}
-                                    className="p-2 bg-white text-red-600 rounded-lg hover:bg-red-50 transition"
-                                >
-                                    <X size={20} />
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="flex items-center justify-between w-full">
-                                <h2 className="text-2xl font-bold text-white text-left">
-                                    {currentNote?.title}
-                                </h2>
-                                <button
-                                    onClick={startEditingTitle}
-                                    className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition border border-white/30"
-                                >
-                                    <Edit3 size={18} className="text-white" />
-                                </button>
-                            </div>
-                        )}
-
-                        <div className="flex flex-wrap gap-2 mt-4">
-                            {currentNote?.topics.map((topic, idx) => (
-                                <span key={idx} className="inline-flex items-center gap-1 bg-white/20 text-white px-3 py-1 rounded-full text-sm font-semibold border border-white/30">
-                                    <Tag size={14} />
-                                    {topic}
+                {/* Main Content Card */}
+                <div className="bg-white rounded-[2rem] border-2 border-gray-100 shadow-2xl overflow-hidden min-h-[500px] flex flex-col transition-all duration-300 hover:border-green-100">
+                    {/* Note Header */}
+                    <div className="bg-gradient-to-r from-green-50 to-teal-50 px-8 py-6 border-b-2 border-gray-100 flex items-center justify-between">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-bold text-green-600 uppercase tracking-wider bg-green-100 px-2 py-1 rounded">
+                                    TOPIC SUMMARY
                                 </span>
-                            ))}
+                                <span className="text-xs font-bold text-gray-400">
+                                    {currentNoteIndex + 1} OF {notes.length}
+                                </span>
+                            </div>
+                            {isEditingTitle ? (
+                                <div className="flex gap-2">
+                                    <input
+                                        value={editedTitle}
+                                        onChange={(e) => setEditedTitle(e.target.value)}
+                                        className="text-2xl font-bold text-gray-900 bg-white border-2 border-green-200 rounded-lg px-3 py-1 w-full focus:outline-none focus:border-green-500"
+                                    />
+                                    <button onClick={handleSaveTitle} className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                        <Save size={20} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-3">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-left">
+                                        {currentNote.title}
+                                    </h2>
+                                    <button onClick={handleEditTitle} className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                                        <Edit3 size={18} />
+                                    </button>
+                                </div>
+                            )}
+                            <div className="flex items-center justify-between mt-4">
+                                <div className="flex flex-wrap gap-2">
+                                    {currentNote.topics.map((topic, idx) => (
+                                        <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/60 text-teal-800 text-xs font-bold border border-teal-200 uppercase tracking-wide">
+                                            <Tag size={12} />
+                                            {topic}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
+
+                        {!isEditingContent && (
+                            <button
+                                onClick={handleEditContent}
+                                className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-green-600 bg-white px-4 py-2 rounded-xl border border-gray-200 hover:border-green-200 transition shadow-sm ml-4 whitespace-nowrap"
+                            >
+                                <Edit3 size={16} />
+                                Edit Notes
+                            </button>
+                        )}
                     </div>
 
-                    <div className="p-8">
+                    {/* Content Area */}
+                    <div className="p-8 flex-1 relative min-h-[350px]">
                         {isEditingContent ? (
                             <div className="space-y-4">
                                 {editedContent.map((item, idx) => (
-                                    <div key={idx}>
-                                        {item.type === 'heading' && (
-                                            <input
-                                                type="text"
-                                                value={item.text}
-                                                onChange={(e) => updateContentItem(idx, e.target.value)}
-                                                className="w-full px-3 py-2 border-2 border-green-300 rounded-lg font-bold text-gray-900 text-left focus:border-green-500 focus:outline-none mb-2"
-                                            />
-                                        )}
-                                        {item.type === 'paragraph' && (
+                                    <div key={idx} className="flex gap-3 items-start">
+                                        <div className="flex-1">
                                             <textarea
                                                 value={item.text}
-                                                onChange={(e) => updateContentItem(idx, e.target.value)}
-                                                className="w-full px-3 py-2 border-2 border-green-300 rounded-lg text-gray-700 text-left focus:border-green-500 focus:outline-none resize-none"
-                                                rows={2}
+                                                onChange={(e) => handleContentChange(idx, e.target.value)}
+                                                className={`w-full p-3 rounded-xl border-2 transition-all focus:outline-none bg-white
+                                                    ${item.type === 'heading' ? 'font-bold text-gray-800 text-lg !bg-gray-50 ' : 'text-gray-600'}
+                                                    ${item.type === 'heading' ? 'border-gray-200 focus:border-green-300' : 'border-gray-100 focus:border-green-200'}
+                                                `}
+                                                rows={item.type === 'paragraph' ? 3 : 1}
                                             />
-                                        )}
-                                        {item.type === 'bullet' && (
-                                            <div className="flex items-start justify-start w-full gap-3">
-                                                <span className="text-green-600 text-xl leading-none mt-2">•</span>
-                                                <textarea
-                                                    value={item.text}
-                                                    onChange={(e) => updateContentItem(idx, e.target.value)}
-                                                    className="flex-1 px-3 py-2 border-2 border-green-300 rounded-lg text-gray-700 text-left focus:border-green-500 focus:outline-none resize-none"
-                                                    rows={1}
-                                                />
-                                            </div>
-                                        )}
+                                        </div>
                                     </div>
                                 ))}
-                                <div className="flex gap-3 mt-6 pt-4 border-t-2 border-gray-200">
-                                    <button
-                                        onClick={saveContent}
-                                        className="flex-1 py-3 rounded-xl font-semibold border-2 border-green-500 flex items-center justify-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 transition"
-                                    >
-                                        <Save size={20} />
+                                <div className="flex gap-3 justify-end pt-4">
+                                    <button onClick={() => setIsEditingContent(false)} className="px-4 py-2 text-gray-600 font-semibold hover:bg-gray-100 rounded-lg">Cancel</button>
+                                    <button onClick={handleSaveContent} className="px-6 py-2 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg flex items-center gap-2">
+                                        <Save size={18} />
                                         Save Changes
-                                    </button>
-                                    <button
-                                        onClick={cancelContentEdit}
-                                        className="flex-1 py-3 rounded-xl font-semibold border-2 border-gray-400 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
-                                    >
-                                        <X size={20} />
-                                        Cancel
                                     </button>
                                 </div>
                             </div>
                         ) : (
-                            <>
-                                <div className="space-y-3 mb-6">
-                                    {currentNote?.content.map((item, idx) => {
+                            <div className="space-y-2 max-w-none text-left prose prose-green prose-lg pb-20">
+                                <div className="flex justify-end -py-[1] ">
+                                    <button
+                                        onClick={toggleReviewLater}
+                                        className={`flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-sm
+                                        ${reviewLater.includes(currentNote.id)
+                                                ? 'bg-orange-500 text-white border border-orange-400'
+                                                : 'bg-white/40 text-teal-900 border border-white/60 hover:bg-white/60 hover:border-red-600'
+                                            }`}
+                                        title="Flag for review."
+                                    >
+                                        <Flag size={14} className={reviewLater.includes(currentNote.id) ? "fill-white" : ""} />
+                                        {reviewLater.includes(currentNote.id) ? "FLAGGED" : "FLAG FOR REVIEW"}
+                                    </button>
+                                </div>
+                                {/* Dynamic Content Items */}
+                                <div className="space-y-6">
+                                    {currentNote.content.map((item, idx) => {
                                         if (item.type === 'heading') {
-                                            return (
-                                                <h3 key={idx} className="text-lg font-bold text-gray-900 mt-4 mb-2 text-left">
-                                                    {item.text}
-                                                </h3>
-                                            );
+                                            return <h4 key={idx} className="text-xl font-bold text-gray-800 border-l-4 border-green-500 pl-4 py-1">{item.text}</h4>;
                                         }
                                         if (item.type === 'paragraph') {
                                             return (
-                                                <p key={idx} className="text-base text-gray-700 leading-relaxed text-left">
+                                                <div key={idx} className="text-lg text-gray-600 leading-relaxed text-left pl-5">
                                                     <FormattedText text={item.text} />
-                                                </p>
+                                                </div>
                                             );
                                         }
                                         if (item.type === 'bullet') {
                                             return (
-                                                <div key={idx} className="flex items-start gap-3">
-                                                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-100 to-teal-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                        <span className="text-green-600 text-sm">•</span>
-                                                    </div>
-                                                    <span className="text-base text-gray-700 leading-relaxed flex-1 text-left">
+                                                <div key={idx} className="flex items-start gap-3 pl-5">
+                                                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 flex-shrink-0" />
+                                                    <div className="text-lg text-gray-600 leading-relaxed text-left">
                                                         <FormattedText text={item.text} />
-                                                    </span>
+                                                    </div>
                                                 </div>
                                             );
                                         }
                                         return null;
                                     })}
                                 </div>
+                            </div>
+                        )}
 
-                                <div className="flex gap-3 pt-4 border-t-2 border-gray-200">
-                                    <button
-                                        onClick={startEditingContent}
-                                        className="flex-1 py-3 rounded-xl font-semibold border-2 border-blue-300 flex items-center justify-center gap-2 bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
-                                    >
-                                        <Edit3 size={20} />
-                                        Edit Note
-                                    </button>
-                                    <button
-                                        onClick={requestExplanation}
-                                        className={`flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition ${showExplanation
-                                            ? 'bg-purple-100 border-2 border-purple-400 text-purple-800'
-                                            : 'bg-purple-50 border-2 border-purple-300 text-purple-700 hover:bg-purple-100'
-                                            }`}
-                                    >
-                                        <MessageSquare size={20} />
-                                        {isLoadingExplanation ? 'Loading...' : showExplanation ? 'Hide Details' : 'More Details'}
-                                    </button>
-                                </div>
-                            </>
+                        {/* AI Action Button */}
+                        {!isEditingContent && (
+                            <div className="absolute right-8 bottom-10 flex flex-col items-end gap-3">
+                                <button
+                                    onClick={requestExplanation}
+                                    className="w-14 h-14 bg-green-600 text-white rounded-full flex items-center justify-center transition-all shadow-lg hover:bg-green-700 hover:scale-110 active:scale-95 border-4 border-green-500/20"
+                                    title="Explain this note"
+                                >
+                                    <Lightbulb size={24} />
+                                </button>
+                            </div>
                         )}
                     </div>
-                </div>
 
-                {showExplanation && !isEditingContent && (
-                    <div className="mb-6 p-6 bg-purple-50 border-2 border-purple-200 rounded-xl">
-                        <div className="flex items-start gap-3">
-                            <Lightbulb className="w-6 h-6 text-purple-600 mt-1 flex-shrink-0" />
-                            <div className="flex-1">
-                                <h4 className="font-bold text-purple-900 mb-2">Extended Details</h4>
-                                <FormattedText text={explanationText} />
+                    {/* AI Explanation */}
+                    {showExplanation && (
+                        <div className="bg-green-50 border-t-2 border-green-100 p-8 animate-slideDown text-left">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                                    <MessageSquare className="w-6 h-6 text-green-600" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-green-900 mb-2">Deep Dive Explanation</h4>
+                                    {isLoadingExplanation ? (
+                                        <div className="flex items-center gap-2 py-2">
+                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-75"></div>
+                                            <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce delay-150"></div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-green-800 text-lg leading-relaxed">
+                                            <FormattedText text={explanationText} />
+                                        </div>
+                                    )}
+                                </div>
+                                <button onClick={() => setShowExplanation(false)} className="text-green-400 hover:text-green-600">
+                                    <X size={20} />
+                                </button>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
-                {!isEditingContent && (
-                    <div className="flex gap-4 mb-8">
+                {/* Footer Controls */}
+                <div className="mt-8 flex items-center justify-between">
+                    <div className="flex gap-4 flex-1">
                         <button
-                            onClick={() => toggleReviewLater(currentNote?.id)}
-                            className={`flex-1 py-4 rounded-xl text-lg font-semibold border-2 flex items-center justify-center gap-2 transition ${isInReview
-                                ? 'border-orange-500 bg-orange-100 text-orange-700 hover:bg-orange-200'
-                                : 'border-orange-400 bg-orange-50 text-orange-600 hover:bg-orange-100'
-                                }`}
+                            onClick={prevNote}
+                            disabled={currentNoteIndex === 0}
+                            className="bg-white border-2 border-gray-300 px-8 py-3 rounded-xl font-bold text-gray-700 flex items-center gap-2 hover:border-green-600 hover:text-green-600 transition shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
                         >
-                            <Flag size={20} className={isInReview ? 'fill-current' : ''} />
-                            {isInReview ? 'Flagged for Review' : 'Flag for Later'}
+                            <ArrowLeft size={20} />
+                            Prev Topic
+                        </button>
+                        <button
+                            onClick={nextNote}
+                            disabled={currentNoteIndex === notes.length - 1}
+                            className="bg-gradient-to-r from-green-600 to-teal-600 px-8 py-3 rounded-xl font-bold text-white flex items-center gap-2 hover:shadow-lg hover:scale-105 transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        >
+                            Next Topic
+                            <ArrowRight size={20} />
                         </button>
                     </div>
-                )}
 
-                <div className="flex gap-4 mb-6">
-                    <button
-                        onClick={prevNote}
-                        disabled={currentNoteIndex === 0}
-                        className="flex-1 py-3 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 flex items-center justify-center gap-2 hover:border-green-600 hover:text-green-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                        <ArrowLeft size={20} />
-                        Previous
-                    </button>
-                    <button
-                        onClick={nextNote}
-                        disabled={currentNoteIndex === notes.length - 1}
-                        className="flex-1 py-3 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 flex items-center justify-center gap-2 hover:border-green-600 hover:text-green-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                        Next
-                        <ArrowRight size={20} />
-                    </button>
-                </div>
-
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
-                    <div
-                        className="h-full bg-gradient-to-r from-green-600 via-teal-600 to-cyan-600 transition-all duration-300"
-                        style={{ width: `${((currentNoteIndex + 1) / notes.length) * 100}%` }}
-                    ></div>
-                </div>
-
-                <div className="flex justify-between text-sm text-gray-600 font-medium">
-                    <span>{reviewLater.length} flagged for review</span>
-                    <span>{notes.length - reviewLater.length} remaining</span>
+                    <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-end">
+                            <span className="text-xs font-bold text-gray-400 uppercase">Progress</span>
+                            <span className="text-sm font-bold text-gray-700">{Math.round(((currentNoteIndex + 1) / notes.length) * 100)}%</span>
+                        </div>
+                        <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                            <div
+                                className="h-full bg-gradient-to-r from-green-500 to-teal-500 transition-all duration-500 ease-out"
+                                style={{ width: `${((currentNoteIndex + 1) / notes.length) * 100}%` }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <style>{`
-        .delay-100 {
-          animation-delay: 0.1s;
-        }
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-      `}</style>
-        </div >
+                .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
+                .animate-slideDown { animation: slideDown 0.3s ease-out; }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
+            `}</style>
+        </div>
     );
 };
 
