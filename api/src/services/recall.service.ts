@@ -58,7 +58,7 @@ OUTPUT FORMAT (JSON):
 
 CARD QUALITY REQUIREMENTS:
 
-1. QUESTION TYPES (Mix these):
+1. QUESTION TYPES (Mix these) (Max Character: 50):
    - Definition: "What is [concept]?"
    - Process: "How does [process] work?"
    - Comparison: "What's the difference between X and Y?"

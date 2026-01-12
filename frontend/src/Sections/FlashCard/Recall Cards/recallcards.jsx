@@ -324,7 +324,7 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
                                         {currentCardIndex + 1} / {flashcards.length}
                                     </div>
                                 </div>
-                                <div className="p-10 flex flex-col items-center justify-center min-h-[300px] max-h-[500px] overflow-y-auto custom-scrollbar">
+                                <div className="px-10 pt-10 pb-[80px] flex flex-col items-center justify-center min-h-[300px] max-h-[500px] overflow-y-auto custom-scrollbar">
                                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8 leading-snug">
                                         {flashcards[currentCardIndex]?.question}
                                     </h2>
@@ -358,7 +358,7 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
                                 <div className="bg-gradient-to-r from-green-500 to-teal-600 px-8 py-6 text-white">
                                     <div className="text-sm font-semibold opacity-90 mb-1">ANSWER</div>
                                 </div>
-                                <div className="p-10 flex items-center justify-center min-h-[300px] max-h-[500px] overflow-y-auto custom-scrollbar">
+                                <div className="px-10 pt-10 pb-24 flex items-center justify-center min-h-[300px] max-h-[500px] overflow-y-auto custom-scrollbar">
                                     <p className="text-xl text-gray-800 leading-relaxed">
                                         {flashcards[currentCardIndex]?.answer}
                                     </p>
