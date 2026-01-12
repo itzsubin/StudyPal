@@ -68,7 +68,140 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
 
     const generateSmartNotes = async () => {
         setIsProcessing(true);
-
+        /* 
+        // MOCK: API disabled for frontend development
+        try {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+                    setNotes([
+                        {
+                            id: 1,
+                            title: "Neural Networks Fundamentals",
+                            topics: ["Neural Networks", "Deep Learning", "AI Architecture"],
+                            content: [
+                                {
+                                    type: "heading",
+                                    text: "What are Neural Networks?"
+                                },
+                                {
+                                    type: "paragraph",
+                                    text: "Neural networks are **computational models** inspired by the human brain's structure and function."
+                                },
+                                {
+                                    type: "heading",
+                                    text: "Core Components"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**Neurons (Nodes)**: Basic processing units that receive inputs and produce outputs"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**Layers**: Input layer, hidden layers, and output layer work together"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**Weights & Biases**: Parameters that adjust during training to improve accuracy"
+                                },
+                                {
+                                    type: "heading",
+                                    text: "Common Types"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**CNNs (Convolutional Neural Networks)**: Best for image recognition"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**RNNs (Recurrent Neural Networks)**: Handle sequential data like text"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**Transformers**: Modern architecture powering ChatGPT and similar models"
+                                }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            title: "Gradient Descent Algorithm",
+                            topics: ["Optimization", "Machine Learning", "Training Process"],
+                            content: [
+                                {
+                                    type: "heading",
+                                    text: "Purpose"
+                                },
+                                {
+                                    type: "paragraph",
+                                    text: "Gradient descent is an **optimization algorithm** used to minimize the loss function and find optimal model parameters."
+                                },
+                                {
+                                    type: "heading",
+                                    text: "The Formula"
+                                },
+                                {
+                                    type: "paragraph",
+                                    text: "**θ = θ - α∇J(θ)**"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**θ (theta)**: Model parameters being optimized"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**α (alpha)**: Learning rate - controls step size"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**∇J(θ)**: Gradient of the loss function"
+                                },
+                                {
+                                    type: "heading",
+                                    text: "Key Insight"
+                                },
+                                {
+                                    type: "paragraph",
+                                    text: "The algorithm moves in the direction of steepest descent, gradually converging to the minimum loss."
+                                }
+                            ]
+                        },
+                        {
+                            id: 3,
+                            title: "Data Preprocessing Best Practices",
+                            topics: ["Data Science", "Preprocessing", "Model Performance"],
+                            content: [
+                                {
+                                    type: "heading",
+                                    text: "Why Preprocess?"
+                                },
+                                {
+                                    type: "paragraph",
+                                    text: "Real-world data is often incomplete, inconsistent, and noisy. **Preprocessing** is vital for model accuracy."
+                                },
+                                {
+                                    type: "heading",
+                                    text: "Common Techniques"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**Handling Missing Values**: Imputation (mean/median) or removing rows"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**Feature Scaling**: Normalization or standardization"
+                                },
+                                {
+                                    type: "bullet",
+                                    text: "**Encoding Categorical Data**: One-hot encoding or label encoding"
+                                },
+                                {
+                                    type: "paragraph",
+                                    text: "⚠️ Never normalize using statistics from the entire dataset - this causes **data leakage**. Always fit on training data only!"
+                                }
+                            ]
+                        }
+                    ]);
+        }
+         */
         try {
             const response = await fetch('http://localhost:8787/notes', {
                 method: 'POST',
@@ -139,7 +272,13 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
 
         setIsLoadingExplanation(true);
         setShowExplanation(true);
-
+        /*
+        // Simulate API call for MOCK explanation to work on the frontend development 
+        setTimeout(() => {
+            setExplanationText("This is a mock explanation generated by the frontend.");
+            setIsLoadingExplanation(false);
+        }, 800);
+        */
         try {
             const currentNote = notes[currentNoteIndex];
             const response = await fetch('http://localhost:8787/notes/explain', {
