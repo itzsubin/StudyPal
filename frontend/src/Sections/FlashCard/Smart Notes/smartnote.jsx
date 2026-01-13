@@ -33,7 +33,7 @@ const FormattedText = ({ text }) => {
                     }
 
                     return (
-                        <span key={index} className="font-semibold bg-yellow-200 text-gray-900 px-1 rounded mx-0.5">
+                        <span key={index} className="font-semibold text-gray-900">
                             {content}
                         </span>
                     );
