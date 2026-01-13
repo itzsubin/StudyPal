@@ -27,44 +27,7 @@ Return a detailed explanation as plain text with **bold formatting** for key ter
 
 REQUIREMENTS:
 
-1. STRUCTURE (3 sections):
-   - **Extended Context**: How this concept fits into the bigger picture
-   - **Real-World Application**: Practical examples and use cases
-   - **Study Tip**: Learning strategy or memory aid
-
-2. STYLE:
-   - Conversational but educational
-   - Build on what's already in the note (don't repeat verbatim)
-   - Add depth: examples, analogies, connections to other concepts
-   - Use **bold** to highlight important terms/phrases
-
-3. LENGTH:
-   - 3-5 paragraphs total
-   - Each section: 1-2 paragraphs
-   - Comprehensive but scannable
-
-4. CONTENT FOCUS:
-   - Explain WHY this matters (not just WHAT it is)
-   - Connect to related concepts
-   - Provide concrete examples
-   - Include common misconceptions if relevant
-   - Suggest practical application or practice methods
-
-5. FORMATTING:
-   - Use **double asterisks** for emphasis
-   - One blank line between sections
-   - No headings needed (sections flow naturally)
-   - Use symbols sparingly (💡, ⚠️, ✓)
-
-EXAMPLE OUTPUT:
-
-**Extended Context:** Neural networks represent a fundamental shift in how we approach problem-solving in computer science. Unlike traditional **rule-based programming**, neural networks learn patterns from data automatically. This concept builds on basic statistics and linear algebra, particularly **matrix operations** and **optimization theory**. Understanding neural networks is essential because they form the foundation for modern AI applications, from image recognition to natural language processing.
-
-**Real-World Application:** Companies use neural networks constantly. **Google Photos** uses CNNs to recognize faces and objects in your photos. **Netflix** employs neural networks to predict which shows you'll enjoy. **Tesla's Autopilot** processes camera feeds through neural networks to detect pedestrians, traffic signs, and lane markings in real-time. Even your smartphone's voice assistant relies on **recurrent neural networks** to understand speech. The architecture you're studying now powers billion-dollar industries.
-
-**Study Tip:** When learning neural networks, start by hand-calculating a simple example with 2-3 neurons. Draw the network diagram and manually compute forward propagation step-by-step. This makes abstract concepts like **weights**, **biases**, and **activation functions** concrete. Try explaining the concept to someone unfamiliar with AI—teaching forces you to truly understand the material. Practice implementing a basic network from scratch before using frameworks like TensorFlow.
-
-Now provide a detailed explanation for this note:
+1. STRUCTURE (3 sections):\n   - **Extended Context**: How this concept fits into the bigger picture\n   - **Real-World Application**: Practical examples and use cases\n   - **Study Tip**: Learning strategy or memory aid\n\n2. STYLE:\n   - Conversational but educational\n   - Build on what's already in the note (don't repeat verbatim)\n   - Add depth: examples, analogies, connections to other concepts\n   - Use **bold** to highlight important terms/phrases\n   - **Be concise**: Every sentence must add value\n\n3. LENGTH:\n   - **2-3 short paragraphs total** (one per section)\n   - Each paragraph: 2-3 sentences max\n   - Prioritize clarity over comprehensiveness\n   - Cut fluff, keep insights\n\n4. CONTENT FOCUS:\n   - Explain WHY this matters (not just WHAT it is)\n   - Connect to related concepts\n   - Provide concrete examples\n   - Include common misconceptions if relevant\n   - Suggest practical application or practice methods\n\n5. FORMATTING:\n   - Use **double asterisks** for emphasis\n   - One blank line between sections\n   - No headings needed (sections flow naturally)\n   - Use symbols sparingly (💡, ⚠️, ✓)\n\nEXAMPLE OUTPUT:\n\n**Extended Context:** Neural networks represent a fundamental shift from **rule-based programming** to learning patterns from data automatically. They build on **matrix operations** and **optimization theory**, forming the foundation for modern AI applications like image recognition and natural language processing.\n\n**Real-World Application:** **Google Photos** uses CNNs for face recognition, **Netflix** predicts your preferences, and **Tesla's Autopilot** detects pedestrians in real-time. The architecture you're studying powers billion-dollar industries.\n\n**Study Tip:** Hand-calculate a simple 2-3 neuron example to make **weights**, **biases**, and **activation functions** concrete. Try explaining it to someone unfamiliar with AI—teaching forces true understanding.\n\nNow provide a detailed explanation for this note:
 
 Note Title: ${note.title}
 Topics: ${note.topics.join(', ')}

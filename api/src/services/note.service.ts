@@ -10,34 +10,7 @@ export async function createNote(
 You are an AI study assistant.
 TASK: Create up to (${limit}) comprehensive smart notes from the provided text.
 
-VALIDATION RULE - CRITICAL:
-Before processing any uploaded content, you MUST intelligently evaluate whether it has genuine educational/learning value.
 
-ACCEPT if the content is:
-- Textbooks, academic papers, research articles, or scholarly work
-- Lecture notes, course materials, or study guides
-- Technical documentation, tutorials, or instructional manuals
-- Educational explanations with clear learning objectives
-- Scientific, mathematical, or analytical content meant to teach concepts
-
-REJECT if the content is:
-- Creative writing, fiction, poetry, or narrative prose (even if well-written)
-- Personal essays, blog posts, or opinion pieces without instructional structure
-- Marketing materials, advertisements, or promotional content
-- Entertainment media (scripts, stories, casual articles)
-- Conversational text, chat logs, or casual descriptions
-- News articles focused on events rather than educational concepts
-
-EDGE CASES - Use judgment:
-- Historical documents → ACCEPT if used for academic study
-- Case studies → ACCEPT if they teach analytical methods or concepts
-- Biography → REJECT unless it's structured as an educational analysis
-- Technical blogs → ACCEPT if they systematically teach skills/concepts, REJECT if just opinion/commentary
-
-If the content is NOT educational, you MUST immediately return this exact JSON with no additional text:
-{"error": "NON_EDUCATIONAL_CONTENT"}
-
-If it IS educational, follow these rules:
 OUTPUT FORMAT (JSON):
 {
   "notes": [
@@ -163,12 +136,26 @@ ${text}
         }
 
         textResponse = textResponse.substring(jsonStart, jsonEnd + 1);
-        const data = JSON.parse(textResponse);
+        let data: any;
 
-        // Phase 3: Turbo Validation Check
-        if (data.error === "NON_EDUCATIONAL_CONTENT") {
-            throw new Error("Content does not appear to be educational material");
+        // Enhanced JSON extraction and sanitization
+        try {
+            // Attempt to clean specific common invalid JSON issues
+            // 1. Remove control characters (newlines within strings that break parsing)
+            const cleanJson = textResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, (match: string) => {
+                return "";
+            });
+            data = JSON.parse(cleanJson);
+        } catch (e) {
+            console.warn("Initial JSON parse failed, attempting strict repair...");
+            try {
+                data = JSON.parse(textResponse);
+            } catch (err) {
+                throw new Error("Failed to parse valid JSON from AI response: " + (err as Error).message);
+            }
         }
+
+
 
         if (!data.notes || !Array.isArray(data.notes)) {
             throw new Error("Invalid response format: missing notes array");
