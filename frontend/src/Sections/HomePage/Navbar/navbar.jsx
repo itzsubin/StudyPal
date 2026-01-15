@@ -48,6 +48,14 @@ function Navbar() {
         >
           Flashcard Generator
         </Link>
+
+        <Link
+          to="/smartquiz"
+          className={`${styles.navlink} ${location.pathname === '/smartquiz' ? styles.active : ''}`}
+          onClick={handleLinkClick('/smartquiz')}
+        >
+          Quiz Generator
+        </Link>
       </div>
 
       <hr className={styles.line} />
