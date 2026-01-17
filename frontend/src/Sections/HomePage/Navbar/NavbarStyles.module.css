@@ -41,8 +41,8 @@
 .info {
   position: fixed;
   display: flex;
-  gap: 2.5rem;
-  left: 400px;
+  gap: 2.4rem;
+  left: 420px;
   align-items: center;
   font-size: 1.2rem;
   font-family: "Poppins", sans-serif;

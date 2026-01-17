@@ -340,7 +340,12 @@ const FlashCard = () => {
     ${uploadedFile
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
                   : 'bg-white text-black border-gray-300 focus:border-blue-600'}`}
+
+
             />
+            <p className="text-sm text-gray-500 mt-2">
+              {inputText.length} characters • Minimum 100 characters required
+            </p>
 
             {/* Generate Button */}
             <button

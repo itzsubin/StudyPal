@@ -1,0 +1,13 @@
+:root {
+    --gradient-primary: linear-gradient(to bottom, #eff6ff 0%, #faf5ff 50%, #fce7f3 100%);
+    background: linear-gradient(to bottom, #eff6ff 0%, #faf5ff 50%, #fce7f3 100%);
+}
+
+.container {
+    background: var(--gradient-primary);
+    width: 100vw;
+    min-height: 100vh;
+    margin-left: calc(-50vw + 50%);
+    overflow: hidden;
+    padding-top: 120px;
+}

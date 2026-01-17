@@ -50,9 +50,9 @@ function Navbar() {
         </Link>
 
         <Link
-          to="/smartquiz"
-          className={`${styles.navlink} ${location.pathname === '/smartquiz' ? styles.active : ''}`}
-          onClick={handleLinkClick('/smartquiz')}
+          to="/quiz"
+          className={`${styles.navlink} ${location.pathname === '/quiz' ? styles.active : ''}`}
+          onClick={handleLinkClick('/quiz')}
         >
           Quiz Generator
         </Link>
