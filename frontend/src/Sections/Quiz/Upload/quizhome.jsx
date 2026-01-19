@@ -1,26 +1,29 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { Upload, FileText, Sparkles, X, Check } from 'lucide-react';
+import QuizCard from '../QuizCard/quizcard';
 import styles from './quizhome.module.css';
-import {
-    Upload,
-    FileText,
-    Sparkles,
-    X,
-    Check
-} from 'lucide-react';
-const QuizHome = () => {
+
+export default function QuizHome() {
     const [currentStep, setCurrentStep] = useState(1);
     const [dragOver, setDragOver] = useState(false);
     const [file, setFile] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState(null);
-    const [isTestingConnection, setIsTestingConnection] = useState(false);
     const [text, setText] = useState('');
     const [quizGenerated, setQuizGenerated] = useState(false);
     const [activeTab, setActiveTab] = useState('upload');
+    const [extractedText, setExtractedText] = useState('');
+    const [numQuestions, setNumQuestions] = useState(5);
+    const [difficulty, setDifficulty] = useState('medium');
+    const [error, setError] = useState(null);
 
     const handleDragOver = (e) => {
         e.preventDefault();
         setDragOver(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setDragOver(false);
     };
 
     const handleDrop = (e) => {
@@ -29,6 +32,8 @@ const QuizHome = () => {
         const droppedFile = e.dataTransfer.files[0];
         if (droppedFile && droppedFile.type === "application/pdf") {
             setFile(droppedFile);
+        } else {
+            alert('Please upload a PDF file');
         }
     };
 
@@ -36,6 +41,8 @@ const QuizHome = () => {
         const selectedFile = e.target.files[0];
         if (selectedFile && selectedFile.type === "application/pdf") {
             setFile(selectedFile);
+        } else {
+            alert('Please upload a PDF file');
         }
     };
 
@@ -43,26 +50,78 @@ const QuizHome = () => {
         setFile(null);
     };
 
-    const generateQuiz = () => {
-        setIsProcessing(true)
-        // Simulate quiz generation
-        setTimeout(() => {
+    const handleGenerateClick = async () => {
+        console.log("Processing content...");
+        setIsProcessing(true);
+        setError(null);
+        setExtractedText('');
+
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing delay
+
+            let contextText = '';
+
+            /* 
+            // REAL API INTEGRATION FOR TEXT EXTRACTION (Commented out for frontend dev)
+            if (activeTab === 'upload' && file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const uploadResponse = await fetch('http://localhost:8787/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const uploadData = await uploadResponse.json();
+                if (!uploadResponse.ok) throw new Error(uploadData.error || 'Failed to process file');
+                if (!uploadData.text) throw new Error('No text could be extracted from this file');
+                contextText = uploadData.text;
+
+            } else if (activeTab === 'text' && text) {
+                if (text.length < 50) throw new Error('Please enter at least 50 characters of text.');
+                contextText = text;
+            } else {
+                 throw new Error('Please upload a file or enter text to generate a quiz.');
+            }
+            */
+
+            // --- MOCK DATA FOR FRONTEND DEV ---
+            if (activeTab === 'text' && text.length < 50 && text.length > 0) {
+                throw new Error('Please enter at least 50 characters of text.');
+            }
+            contextText = text || "Mock extracted text from PDF/Upload...";
+
+            setExtractedText(contextText);
+            setCurrentStep(2);
             setIsProcessing(false);
-            setQuizGenerated(true);
-            setTimeout(() => setQuizGenerated(false), 2000);
-        }, 2000);
+
+        } catch (error) {
+            console.error('Processing error:', error);
+            setError(error.message || 'Failed to process content. Please try again.');
+            setIsProcessing(false);
+        }
     };
 
-    const canGenerate = (activeTab === 'upload' && file) || (activeTab === 'text' && text.trim().length > 50);
 
+    const canGenerate = true;
+    //const canGenerate = (activeTab === 'upload' && file) || (activeTab === 'text' && text.trim().length > 100);
+
+    const resetFlow = () => {
+        setCurrentStep(1);
+        setFile(null);
+        setExtractedText('');
+        setText('');
+        setQuizGenerated(false);
+        setError(null);
+    };
 
     return (
         <div className={styles.container}>
-            {/* Processing */}
+            {/* Processing Overlay */}
             {isProcessing && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
                     <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-md w-full mx-4 text-center">
-                        <div className="w-20 h-20 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
+                        <div className="w-20 h-20 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-6"></div>
                         <h2 className="text-2xl font-bold text-gray-900 mb-3">
                             Analyzing your content...
                         </h2>
@@ -70,17 +129,27 @@ const QuizHome = () => {
                             Our AI is extracting key concepts and creating your study materials
                         </p>
                         <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce delay-100"></div>
-                            <div className="w-2 h-2 bg-pink-600 rounded-full animate-bounce delay-200"></div>
+                            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                            <div className="w-2 h-2 bg-pink-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Step 1 - Upload */}
+            {/* Step 2 - Quiz Card (Placeholder for QuizCard component) */}
+            {currentStep === 2 && (
+                <QuizCard
+                    text={extractedText}
+                    numQuestions={numQuestions}
+                    difficulty={difficulty}
+                />
+
+            )}
+
+            {/* Step 1 - Upload Section */}
             {currentStep === 1 && (
-                <div className="flex justify-center items-center p-8">
+                <div className="flex justify-center items-center p-2">
                     <div className="max-w-3xl w-full">
                         {/* Header */}
                         <div className="text-center mb-10">
@@ -92,6 +161,7 @@ const QuizHome = () => {
                                 Upload your study material and let AI create custom quizzes for you
                             </p>
                         </div>
+
                         {/* Main Card */}
                         <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
                             {/* Tab Selector */}
@@ -125,7 +195,11 @@ const QuizHome = () => {
                                         <div
                                             onDrop={handleDrop}
                                             onDragOver={handleDragOver}
-                                            className="border-3 border-dashed border-gray-300 rounded-2xl p-12 text-center hover:border-indigo-400 hover:bg-indigo-50/50 transition-all cursor-pointer"
+                                            onDragLeave={handleDragLeave}
+                                            className={`border-3 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer ${dragOver
+                                                ? 'border-indigo-500 bg-indigo-50'
+                                                : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50/50'
+                                                }`}
                                         >
                                             <input
                                                 type="file"
@@ -180,10 +254,10 @@ const QuizHome = () => {
                                         value={text}
                                         onChange={(e) => setText(e.target.value)}
                                         placeholder="Paste your study notes, textbook content, or any educational material here..."
-                                        className="w-full h-64 p-6 bg-white border-2 border-gray-200 rounded-2xl focus:border-indigo-400 focus:outline-none resize-none text-gray-700 placeholder-gray-400"
+                                        className=" bg-gray-50 w-full h-64 p-6 border-2 border-gray-200 rounded-2xl focus:border-indigo-400 focus:outline-none resize-none text-gray-700 placeholder-gray-400"
                                     />
-                                    <p className="bg-white text-sm text-gray-500 mt-2">
-                                        {text.length} characters • Minimum 50 characters required
+                                    <p className="text-sm text-gray-500 mt-2">
+                                        {text.length} characters • Minimum 100 characters required
                                     </p>
                                 </div>
                             )}
@@ -198,32 +272,56 @@ const QuizHome = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Number of Questions
                                         </label>
-                                        <select className="bg-gray-50 text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                            <option>5 questions</option>
-                                            <option>10 questions</option>
-                                            <option>15 questions</option>
-                                            <option>20 questions</option>
+                                        <select
+                                            value={numQuestions}
+                                            onChange={(e) => setNumQuestions(Number(e.target.value))}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-700"
+                                        >
+                                            <option value={5}>5 questions</option>
+                                            <option value={10}>10 questions</option>
+                                            <option value={15}>15 questions</option>
+                                            <option value={20}>20 questions</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Difficulty Level
                                         </label>
-                                        <select className="bg-gray-50 text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                            <option>Easy</option>
-                                            <option>Medium</option>
-                                            <option>Hard</option>
-                                            <option>Mixed</option>
+                                        <select
+                                            value={difficulty}
+                                            onChange={(e) => setDifficulty(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-700"
+                                        >
+                                            <option value="easy">Easy</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="hard">Hard</option>
+                                            <option value="mixed">Mixed</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Error Message */}
+                            {error && (
+                                <div className="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
+                                    <div className="flex-1">
+                                        <h4 className="font-semibold text-red-800 mb-1">Error Generating Quiz</h4>
+                                        <p className="text-sm text-red-600">{error}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setError(null)}
+                                        className="text-red-400 hover:text-red-600"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            )}
+
                             {/* Generate Button */}
                             <button
-                                onClick={isProcessing}
-                                disabled={!isProcessing}
-                                className={`w-full mt-6 py-4 rounded-xl font-semibold text-white transition-all shadow-lg ${canGenerate && !generating
+                                onClick={handleGenerateClick}
+                                disabled={!canGenerate || isProcessing}
+                                className={`w-full mt-6 py-4 rounded-xl font-semibold text-white transition-all shadow-lg ${canGenerate && !isProcessing
                                     ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02]'
                                     : 'bg-gray-300 cursor-not-allowed'
                                     }`}
@@ -248,9 +346,6 @@ const QuizHome = () => {
                     </div>
                 </div>
             )}
-
         </div>
-    )
+    );
 }
-
-export default QuizHome;
