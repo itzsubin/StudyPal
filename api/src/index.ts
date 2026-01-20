@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import upload from './routes/upload'
 import recall from './routes/recall'
 import note from './routes/note'
+import quiz from './routes/quiz'
 
 
 type Bindings = {
@@ -37,6 +38,7 @@ app.get('/health', (c) => {
 app.route('/upload', upload)
 app.route('/recall', recall)
 app.route('/notes', note)
+app.route('/quiz', quiz)
 
 
 
