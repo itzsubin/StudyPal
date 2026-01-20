@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, ChevronRight, RotateCcw, ChevronLeft } from 'lucide-react';
+import styles from './quizcard.module.css';
 
-export default function QuizCard({ text, numQuestions, difficulty }) {
+export default function QuizCard({ text, numQuestions, difficulty, onBack }) {
     const [quiz, setQuiz] = useState(null);
     const [isGenerating, setIsGenerating] = useState(true);
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -19,15 +20,36 @@ export default function QuizCard({ text, numQuestions, difficulty }) {
                 const count = numQuestions || 5;
                 const diff = difficulty || 'medium';
 
-                // --- MOCK API CALL ---
-                // In real implementation, this would be:
-                // const response = await fetch('http://localhost:8787/quiz', { ...body: { text, numQuestions, difficulty } ... });
+                console.log("Generating Quiz with:", { count, diff, textLength: text.length });
 
+                /* 
+                // COMPLETED: Real Backend Integration
+                const response = await fetch('http://localhost:8787/quiz', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text, 
+                        numQuestions: parseInt(count), 
+                        difficulty: diff 
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to generate quiz');
+                }
+
+                const quizData = await response.json();
+                setQuiz(quizData);
+                setIsGenerating(false);
+                */
+
+                // --- MOCK API CALL (Active for Testing) ---
                 await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
 
                 const mockQuizData = {
                     title: `Generated Quiz (${diff})`,
-                    questions: Array.from({ length: count }, (_, i) => ({
+                    questions: Array.from({ length: parseInt(count) }, (_, i) => ({
                         id: i + 1,
                         question: `Generated Question ${i + 1} based on text?`,
                         options: ["Option A", "Option B", "Option C", "Option D"],
@@ -40,7 +62,7 @@ export default function QuizCard({ text, numQuestions, difficulty }) {
 
             } catch (err) {
                 console.error("Quiz generation failed:", err);
-                setError("Failed to generate quiz. Please try again.");
+                setError(err.message || "Failed to generate quiz. Please try again.");
                 setIsGenerating(false);
             }
         };
@@ -244,16 +266,25 @@ export default function QuizCard({ text, numQuestions, difficulty }) {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6">
+        <div className={styles.container}>
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <h2 className="text-left text-xl font-bold text-gray-800">{quiz.title}</h2>
-                            <p className="text-left text-sm text-gray-500">
-                                Question {currentQuestion + 1} of {quiz.questions.length}
-                            </p>
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={onBack}
+                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+                                title="Back to content upload"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            <div>
+                                <h2 className="text-left text-xl font-bold text-gray-800">{quiz.title}</h2>
+                                <p className="text-left text-sm text-gray-500">
+                                    Question {currentQuestion + 1} of {quiz.questions.length}
+                                </p>
+                            </div>
                         </div>
                         <div className="text-right">
                             <p className="text-sm text-gray-500 mb-1">Progress</p>

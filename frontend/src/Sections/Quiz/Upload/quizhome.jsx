@@ -143,6 +143,7 @@ export default function QuizHome() {
                     text={extractedText}
                     numQuestions={numQuestions}
                     difficulty={difficulty}
+                    onBack={() => setCurrentStep(1)}
                 />
 
             )}
