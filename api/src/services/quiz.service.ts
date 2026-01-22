@@ -154,8 +154,7 @@ Generate the exam-quality quiz now.`;
             body: JSON.stringify({
                 "model": "qwen/qwen-2.5-vl-7b-instruct:free",
                 "messages": [{ "role": "user", "content": prompt }],
-                "temperature": 0.3,
-                "response_format": { "type": "json_object" }
+                "temperature": 0.3
             })
         });
 
@@ -185,8 +184,8 @@ Generate the exam-quality quiz now.`;
 
         return quizData;
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error generating quiz:", error);
-        throw new Error("Failed to generate quiz");
+        throw new Error(`Quiz generation failed: ${error.message || error}`);
     }
 }

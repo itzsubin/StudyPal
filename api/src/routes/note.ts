@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { createNote } from '../services/note.service';
-import { generateExplanation } from '../services/noteassistant.service';
+import { createNote } from '../services/Notes/note.service';
+import { generateExplanation } from '../services/Notes/noteassistant.service';
 
 type Bindings = {
     OPENROUTER_API_KEY: string;

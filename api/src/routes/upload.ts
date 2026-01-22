@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { extractTextFromPDF } from '../services/file.service';
-import { validateContent } from '../services/content.service';
+import { extractTextFromPDF } from '../services/Files and AUTH/file.service';
+import { validateContent } from '../services/Files and AUTH/content.service';
 
 type Bindings = {
   MISTRAL_API_KEY: string

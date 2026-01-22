@@ -1,4 +1,4 @@
-import { SmartNote } from '../types/notes';
+import { SmartNote } from '../../types/notes';
 
 export async function generateExplanation(
     apiKey: string,

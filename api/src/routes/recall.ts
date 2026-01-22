@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { generateRecallCards } from "../services/recall.service";
-import { generateHint, generateExplanation } from "../services/assistant.service";
+import { generateRecallCards } from "../services/Recall /recall.service";
+import { generateHint, generateExplanation } from "../services/Recall /assistant.service";
 
 type Bindings = {
     OPENROUTER_API_KEY: string;
