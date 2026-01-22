@@ -18,62 +18,133 @@ export async function generateQuiz(
 ): Promise<QuizData> {
     try {
         const prompt = `
-You are an expert educational assessment designer specializing in creating high-quality, exam-focused quiz questions. Your goal is to help students thoroughly prepare for their exams through effective practice questions.
+You are an elite educational assessment designer with expertise in creating exam-caliber questions. Your mission: craft ${numQuestions} multiple-choice questions that rigorously prepare students for competitive exams while building genuine understanding.
 
-TASK:
-Create ${numQuestions} multiple-choice questions based on the provided study material that will maximize student learning and exam readiness.
+CORE OBJECTIVE:
+Generate questions that mirror real exam formats, test deep comprehension, and help students identify knowledge gaps before the actual test.
 
 PARAMETERS:
-- Number of Questions: ${numQuestions}
+- Questions to Generate: ${numQuestions}
 - Difficulty Level: ${difficulty}
 
-DIFFICULTY GUIDELINES:
+DIFFICULTY SPECIFICATIONS:
 ${difficulty === 'easy' ? `
-- Easy: Focus on fundamental concepts, definitions, and basic recall
-- Test surface-level understanding and key terminology
-- Direct questions with clear, unambiguous answers
-- Help build student confidence and foundational knowledge
+EASY MODE - Foundation Building:
+• Focus on core concepts, definitions, and essential facts
+• Test recognition and basic recall of key information
+• Use straightforward language with clear answer choices
+• Build student confidence while establishing baseline knowledge
+• Questions should be answerable with fundamental understanding
 ` : difficulty === 'medium' ? `
-- Medium: Test application of concepts and deeper understanding
-- Require students to connect ideas and analyze information
-- Mix of recall and application-based questions
-- Challenge students while remaining fair and achievable
+MEDIUM MODE - Application & Analysis:
+• Test ability to apply concepts to new situations
+• Require connecting multiple ideas or analyzing relationships
+• Include scenario-based questions that mirror exam contexts
+• Balance accessibility with intellectual challenge
+• Assess true comprehension beyond simple memorization
 ` : difficulty === 'hard' ? `
-- Hard: Require critical thinking, synthesis, and advanced analysis
-- Test nuanced understanding and ability to evaluate complex scenarios
-- Include edge cases and require multi-step reasoning
-- Prepare students for the most challenging exam questions
+HARD MODE - Mastery & Critical Thinking:
+• Demand synthesis of complex concepts and multi-step reasoning
+• Test ability to evaluate, compare, and distinguish subtle differences
+• Include edge cases and nuanced scenarios
+• Prepare for the most challenging exam questions
+• Require deep understanding and analytical thinking
 ` : `
-- Mixed: Blend of easy (30%), medium (50%), and hard (20%) questions
-- Progressive difficulty to build confidence then challenge mastery
-- Comprehensive coverage across all cognitive levels
+MIXED MODE - Comprehensive Assessment:
+• 30% Easy: Foundation questions for confidence
+• 50% Medium: Core application and analysis questions  
+• 20% Hard: Advanced critical thinking challenges
+• Progressive difficulty curve throughout the quiz
+• Comprehensive topic coverage at all cognitive levels
 `}
 
-        
-        OUTPUT FORMAT (Strict JSON):
-        {
-            "title": "A short, relevant title for the quiz",
-            "questions": [
-                {
-                    "id": 1,
-                    "question": "Question text here...",
-                    "options": [
-                        "Option A",
-                        "Option B",
-                        "Option C",
-                        "Option D"
-                    ],
-                    "correctAnswer": "The exact string of the correct option"
-                }
-            ]
-        }
-        
-        RULES:
-        1. Contextual Accuracy: All questions must be answerable from the text.
-        2. Distractors: Wrong options should be plausible but clearly incorrect.
-        3. Valid JSON: Return ONLY the JSON object, no markdown or conversational filler.
-        `;
+QUESTION CRAFTING EXCELLENCE:
 
+1. EXAM AUTHENTICITY
+   • Mirror the style, tone, and complexity of real standardized exams
+   • Focus on high-yield concepts frequently tested in actual assessments
+   • Use professional, academic language appropriate for formal testing
+   • Avoid overly casual or conversational phrasing
+
+2. PRECISION & CLARITY
+   • Every question must have ONE definitively correct answer
+   • Eliminate ambiguity - questions should be crystal clear
+   • Use precise terminology consistent with the source material
+   • Ensure grammatical perfection in all questions and options
+
+3. STRATEGIC DISTRACTOR DESIGN
+   • Wrong answers must be believable to unprepared students
+   • Base distractors on common misconceptions and typical errors
+   • Include "almost correct" options that test careful reading
+   • Avoid obviously absurd or joke answers
+   • Use plausible numbers, terms, and concepts from related topics
+   • Never make distractors longer or more detailed than correct answers
+
+4. ANSWER OPTION ENGINEERING
+   • Maintain similar length across all four options (avoid length bias)
+   • Keep grammatical structure parallel across choices
+   • Randomize correct answer positions (avoid patterns like "B" always being right)
+   • Use specific, concrete language rather than vague terms
+   • Ensure all options fit grammatically with the question stem
+
+5. COMPETITIVE EXAM PREPARATION
+   • Include questions that test attention to detail and careful reading
+   • Cover the "most commonly missed" concepts in the subject area
+   • Test ability to distinguish between closely related concepts
+   • Prepare students for both straightforward and tricky exam formats
+   • Build pattern recognition for typical exam question structures
+
+6. COMPREHENSIVE COVERAGE
+   • Distribute questions evenly across all major topics in the material
+   • Avoid clustering too many questions on a single subtopic
+   • Test both broad themes and specific details
+   • Include a mix of conceptual and factual questions
+
+7. COGNITIVE DIVERSITY
+   • Remember/Recall: "What is...?" "Define..." "Identify..."
+   • Understand: "Explain why..." "What is the relationship..."
+   • Apply: "In this scenario..." "Which example demonstrates..."
+   • Analyze: "Compare..." "What distinguishes..." "Why does..."
+   • Evaluate: "Which is most effective..." "What is the best approach..."
+
+CONTENT TO ANALYZE:
+"""
+${text.slice(0, 15000)}
+"""
+
+OUTPUT FORMAT:
+Return ONLY valid JSON. No markdown code blocks, no explanatory text, no preamble - just the pure JSON object:
+
+{
+  "title": "Concise, descriptive quiz title reflecting the content",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Precise, well-formed question text?",
+      "options": [
+        "First plausible answer option",
+        "Second plausible answer option",
+        "Third plausible answer option",
+        "Fourth plausible answer option"
+      ],
+      "correctAnswer": "The exact string matching one of the options above"
+    }
+  ]
+}
+
+CRITICAL VALIDATION CHECKLIST:
+✓ Exactly ${numQuestions} questions generated
+✓ Each question has exactly 4 options
+✓ correctAnswer matches one option string EXACTLY (character-perfect)
+✓ All questions are directly answerable from the provided text
+✓ No markdown formatting, code blocks, or conversational text
+✓ Valid, parseable JSON structure
+✓ Professional academic language throughout
+✓ Varied question types and cognitive levels
+✓ Strategic distractor placement
+✓ Random distribution of correct answer positions
+
+Generate the exam-quality quiz now.`;
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
