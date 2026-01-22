@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Check, X, ChevronRight, RotateCcw, ChevronLeft } from 'lucide-react';
 import styles from './quizcard.module.css';
 
-export default function QuizCard({ text, numQuestions, difficulty, onBack }) {
+export default function QuizCard({ text, numQuestions, difficulty, onBack, onReset }) {
     const [quiz, setQuiz] = useState(null);
     const [isGenerating, setIsGenerating] = useState(true);
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -133,6 +133,14 @@ export default function QuizCard({ text, numQuestions, difficulty, onBack }) {
         // setIsGenerating(true); 
         // generateQuiz();
     };
+    const restartQuizdifferentupload = () => {
+        // Reset local state (optional, but good for cleanup)
+        setShowResults(false);
+        setQuiz(null);
+
+        // Navigate back to upload screen with full reset
+        if (onReset) onReset();
+    }
 
 
     if (isGenerating) {
@@ -250,13 +258,20 @@ export default function QuizCard({ text, numQuestions, difficulty, onBack }) {
                             })}
                         </div>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 justify-between">
                             <button
                                 onClick={restartQuiz}
                                 className="flex-1 py-4 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center gap-2"
                             >
                                 <RotateCcw className="w-5 h-5" />
                                 Create New Quiz
+                            </button>
+                            <button
+                                onClick={restartQuizdifferentupload}
+                                className="flex-1 py-4 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center gap-2"
+                            >
+                                <RotateCcw className="w-5 h-5" />
+                                Create New Quiz with different upload
                             </button>
                         </div>
                     </div>

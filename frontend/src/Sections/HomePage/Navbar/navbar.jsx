@@ -25,13 +25,17 @@ function Navbar() {
 
   return (
     <nav className={styles.container}>
-      <div className={styles.logocontainer}>
+      <Link
+        to="/"
+        className={styles.logocontainer}
+        onClick={handletitleClick}
+      >
         <img
           src={logo}
           alt="StudyPal logo"
           className={styles.logo}
         />
-      </div>
+      </Link>
       <div className={styles.info}>
         <Link
           to="/"

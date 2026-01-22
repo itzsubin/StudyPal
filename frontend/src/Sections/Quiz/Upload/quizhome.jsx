@@ -137,13 +137,14 @@ export default function QuizHome() {
                 </div>
             )}
 
-            {/* Step 2 - Quiz Card (Placeholder for QuizCard component) */}
+            {/* Step 2 - Quiz Card */}
             {currentStep === 2 && (
                 <QuizCard
                     text={extractedText}
                     numQuestions={numQuestions}
                     difficulty={difficulty}
                     onBack={() => setCurrentStep(1)}
+                    onReset={resetFlow}
                 />
 
             )}

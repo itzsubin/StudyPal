@@ -16,7 +16,7 @@ function Home() {
 
       <div className="relative z-10 text-center">
         <div className="inline-flex items-center gap-2 bg-white px-4 py-2.5 rounded-full shadow-sm mb-8 md:mb-10 lg:mb-12">
-          <span className="text-m font-semibold text-gray-700">
+          <span className="text-m font-bold text-gray-700">
             AI assists. The student decides.
           </span>
         </div>
