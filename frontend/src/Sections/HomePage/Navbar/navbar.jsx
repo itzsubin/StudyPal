@@ -20,6 +20,7 @@ function Navbar() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       navigate("/");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -61,7 +62,21 @@ function Navbar() {
           Quiz Generator
         </Link>
       </div>
+      <div className={styles.buttoncontainer}>
+        <Link to="/login"
+          className={styles.loginbtn}
+        >
+          Login
+        </Link>
 
+        <Link to="/signup"
+          className={styles.signupbtn}
+        >
+          Sign Up
+        </Link>
+
+
+      </div>
       <hr className={styles.line} />
     </nav>
   );

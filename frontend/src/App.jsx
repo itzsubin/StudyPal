@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from "./Sections/HomePage/Navbar";
 import Home from "./Sections/HomePage/Home";
 import Info from "./Sections/HomePage/Info";
@@ -8,6 +8,7 @@ import Visual from "./Sections/HomePage/Visual";
 import Foter from "./Sections/HomePage/Footer";
 import FlashCardGenerator from "./Sections/FlashCard";
 import QuizGenerator from "./Sections/Quiz";
+import Cursor from "./Sections/Common/cursor";
 
 function HomePage() {
   return (
@@ -21,17 +22,27 @@ function HomePage() {
   );
 }
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+
   return (
-    <Router>
+    <>
       <Navbar />
+      {location.pathname === "/" && <Cursor />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/flashcard" element={<FlashCardGenerator />} />
         <Route path="/quiz" element={<QuizGenerator />} />
       </Routes>
-    </Router>
+    </>
+  );
+}
 
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 
