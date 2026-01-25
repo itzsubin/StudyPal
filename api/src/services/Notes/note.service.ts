@@ -3,7 +3,7 @@ import { SmartNote } from '../../types/notes';
 export async function createNote(
     apiKey: string,
     text: string,
-    limit: number = 20,
+    limit: number = 10,
 ): Promise<SmartNote[]> {
     try {
         const prompt = `
@@ -94,7 +94,7 @@ ${text}
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                "model": "xiaomi/mimo-v2-flash:free",
+                "model": "nvidia/nemotron-3-nano-30b-a3b:free",
                 "messages": [
                     {
                         "role": "user",
@@ -119,6 +119,16 @@ ${text}
         }
 
         const result: any = await response.json();
+
+        // Check for provider-specific errors
+        if (result.error && result.error.code === 524) {
+            throw new Error("The AI model timed out (524). Please try again with shorter text.");
+        }
+
+        if (!result.choices || !result.choices[0] || !result.choices[0].message) {
+            console.error("Unexpected API response structure:", JSON.stringify(result));
+            throw new Error(`Invalid API response: 'choices' missing. Received: ${JSON.stringify(result)}`);
+        }
         let textResponse = result.choices[0].message.content;
 
         // More robust JSON extraction

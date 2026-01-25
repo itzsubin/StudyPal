@@ -152,8 +152,17 @@ Generate the exam-quality quiz now.`;
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": "qwen/qwen-2.5-vl-7b-instruct:free",
-                "messages": [{ "role": "user", "content": prompt }],
+                "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a strict JSON generator. You MUST output valid JSON only. No explanations, no markdown, no extra text."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
                 "temperature": 0.3
             })
         });
@@ -164,6 +173,15 @@ Generate the exam-quality quiz now.`;
         }
 
         const result: any = await response.json();
+
+        if (result.error) {
+            throw new Error(`Provider returned error: ${result.error.message || JSON.stringify(result.error)}`);
+        }
+
+        if (!result.choices || !result.choices[0] || !result.choices[0].message) {
+            throw new Error(`Invalid API response: 'choices' missing. Received: ${JSON.stringify(result)}`);
+        }
+
         let content = result.choices[0].message.content.trim();
 
         // Robust JSON extraction
@@ -189,3 +207,4 @@ Generate the exam-quality quiz now.`;
         throw new Error(`Quiz generation failed: ${error.message || error}`);
     }
 }
+

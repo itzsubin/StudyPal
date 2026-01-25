@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { generateQuiz } from "../services/quiz.service";
+import { generateQuiz } from "../services/Quiz/quiz.service";
 
 type Bindings = {
     OPENROUTER_API_KEY: string;
@@ -21,7 +21,14 @@ quiz.post("/", async (c) => {
             return c.json({ error: "Server configuration error" }, 500);
         }
 
+        console.log(`[Quiz] Received request. Text length: ${text.length}, Questions: ${numQuestions}, Difficulty: ${difficulty}`);
+        console.log("[Quiz] Starting generation...");
+
+        const startTime = Date.now();
         const result = await generateQuiz(apiKey, text, numQuestions, difficulty);
+        const duration = Date.now() - startTime;
+
+        console.log(`[Quiz] Generation successful in ${duration}ms`);
         return c.json(result);
     } catch (error: any) {
         console.error("Error in quiz route:", error);

@@ -15,7 +15,7 @@ You are an AI study assistant helping students understand their notes better.
 
 TASK: Provide an extended explanation for the given note to deepen understanding.
 
-INPUT:
+INPUT:x
 - Note title: ${note.title}
 - Note topics: ${note.topics.join(', ')}
 - Note content: 
@@ -41,7 +41,7 @@ ${noteContentText}`;
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": "xiaomi/mimo-v2-flash:free",
+                "model": "nvidia/nemotron-3-nano-30b-a3b:free",
                 "messages": [{ "role": "user", "content": prompt }],
                 "temperature": 0.3
             })
