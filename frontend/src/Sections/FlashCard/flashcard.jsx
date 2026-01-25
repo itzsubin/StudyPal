@@ -221,10 +221,6 @@ const FlashCard = () => {
                     connectionStatus === 'offline' ? 'bg-red-500' :
                       'bg-blue-400 animate-bounce'
                     }`} />
-                  {isTestingConnection ? 'Checking Connection...' :
-                    connectionStatus === 'online' ? 'API Connected & Ready' :
-                      connectionStatus === 'offline' ? 'API Connection Failed' :
-                        'Test API Connection'}
                 </button>
               </div>
             </div>
@@ -391,7 +387,7 @@ const FlashCard = () => {
                   Test your memory with flip cards
                 </p>
                 <div className="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold mb-4">
-                  Up to 15 cards
+                  Up to 10 cards
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-sm text-gray-700">✓ Question & Answer format</span>
@@ -414,7 +410,7 @@ const FlashCard = () => {
                   Quick revision of key concepts
                 </p>
                 <div className="inline-block bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm font-semibold mb-4">
-                  Up to 20 notes
+                  Up to 10 notes
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-sm text-gray-700">✓ Condensed bullet points</span>

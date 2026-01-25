@@ -61,8 +61,11 @@ export default function QuizHome() {
 
             let contextText = '';
 
-            /* 
-            // REAL API INTEGRATION FOR TEXT EXTRACTION (Commented out for frontend dev)
+
+
+
+
+            // REAL API INTEGRATION FOR TEXT EXTRACTION
             if (activeTab === 'upload' && file) {
                 const formData = new FormData();
                 formData.append('file', file);
@@ -81,20 +84,24 @@ export default function QuizHome() {
                 if (text.length < 50) throw new Error('Please enter at least 50 characters of text.');
                 contextText = text;
             } else {
-                 throw new Error('Please upload a file or enter text to generate a quiz.');
+                throw new Error('Please upload a file or enter text to generate a quiz.');
             }
-            */
-
-            // --- MOCK DATA FOR FRONTEND DEV ---
-            if (activeTab === 'text' && text.length < 50 && text.length > 0) {
-                throw new Error('Please enter at least 50 characters of text.');
-            }
-            contextText = text || "Mock extracted text from PDF/Upload...";
 
             setExtractedText(contextText);
             setCurrentStep(2);
             setIsProcessing(false);
 
+
+            /*
+                        // --- MOCK DATA FOR FRONTEND DEV ---
+                        if (activeTab === 'text' && text.length < 50 && text.length > 0) {
+                            throw new Error('Please enter at least 50 characters of text.');
+                        }
+                        contextText = text || "Mock extracted text from PDF/Upload...";
+                        setExtractedText(contextText);
+                        setCurrentStep(2);
+                        setIsProcessing(false);
+            */
         } catch (error) {
             console.error('Processing error:', error);
             setError(error.message || 'Failed to process content. Please try again.');
@@ -103,8 +110,8 @@ export default function QuizHome() {
     };
 
 
-    const canGenerate = true;
-    //const canGenerate = (activeTab === 'upload' && file) || (activeTab === 'text' && text.trim().length > 100);
+    //const canGenerate = true;
+    const canGenerate = (activeTab === 'upload' && file) || (activeTab === 'text' && text.trim().length > 100);
 
     const resetFlow = () => {
         setCurrentStep(1);

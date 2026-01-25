@@ -22,15 +22,18 @@ export default function QuizCard({ text, numQuestions, difficulty, onBack, onRes
 
                 console.log("Generating Quiz with:", { count, diff, textLength: text.length });
 
-                /* 
+
+
+
+
                 // COMPLETED: Real Backend Integration
                 const response = await fetch('http://localhost:8787/quiz', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        text, 
-                        numQuestions: parseInt(count), 
-                        difficulty: diff 
+                    body: JSON.stringify({
+                        text,
+                        numQuestions: parseInt(count),
+                        difficulty: diff
                     })
                 });
 
@@ -42,8 +45,10 @@ export default function QuizCard({ text, numQuestions, difficulty, onBack, onRes
                 const quizData = await response.json();
                 setQuiz(quizData);
                 setIsGenerating(false);
-                */
 
+
+
+                /*
                 // --- MOCK API CALL (Active for Testing) ---
                 await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
 
@@ -59,10 +64,11 @@ export default function QuizCard({ text, numQuestions, difficulty, onBack, onRes
 
                 setQuiz(mockQuizData);
                 setIsGenerating(false);
+                */
 
             } catch (err) {
-                console.error("Quiz generation failed:", err);
-                setError(err.message || "Failed to generate quiz. Please try again.");
+                console.error("Quiz generation failed (Full Detail):", err);
+                setError("Failed to generate quiz. Please try again.");
                 setIsGenerating(false);
             }
         };
@@ -259,13 +265,6 @@ export default function QuizCard({ text, numQuestions, difficulty, onBack, onRes
                         </div>
 
                         <div className="flex gap-4 justify-between">
-                            <button
-                                onClick={restartQuiz}
-                                className="flex-1 py-4 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center gap-2"
-                            >
-                                <RotateCcw className="w-5 h-5" />
-                                Create New Quiz
-                            </button>
                             <button
                                 onClick={restartQuizdifferentupload}
                                 className="flex-1 py-4 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center gap-2"

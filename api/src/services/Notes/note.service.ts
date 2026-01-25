@@ -19,10 +19,9 @@ OUTPUT FORMAT (JSON):
       "title": "Concise, descriptive title (3-6 words)",
       "topics": ["Topic1", "Topic2", "Topic3"],
       "content": [
-        { "type": "heading", "text": "Section heading" },
-        { "type": "paragraph", "text": "Explanation with **key terms** highlighted" },
-        { "type": "bullet", "text": "**Concept**: Brief explanation" },
-        ...
+        { "type": "heading", "text": "Section Name" },
+        { "type": "paragraph", "text": "Explanation text." },
+        { "type": "bullet", "text": "Key point 1" }
       ]
     }
   ]
