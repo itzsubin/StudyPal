@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './NavbarStyles.module.css';
 import logo from '../../../assets/logo.png';
 
-function Navbar() {
+function Navbar(props) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -63,19 +63,21 @@ function Navbar() {
         </Link>
       </div>
       <div className={styles.buttoncontainer}>
-        <Link to="/login"
+        <div
+          onClick={props.onLoginClick}
           className={styles.loginbtn}
+          style={{ cursor: 'pointer' }}
         >
           Login
-        </Link>
+        </div>
 
-        <Link to="/signup"
+        <div
+          onClick={props.onSignupClick}
           className={styles.signupbtn}
+          style={{ cursor: 'pointer' }}
         >
           Sign Up
-        </Link>
-
-
+        </div>
       </div>
       <hr className={styles.line} />
     </nav>
