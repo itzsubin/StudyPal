@@ -110,11 +110,13 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(16, 50, 124, 0.1);
 }
 
 .loginbtn:hover {
   color: #2563eb;
   background-color: rgba(37, 99, 235, 0.05);
+  border-color: rgba(37, 99, 235, 0.1);
 }
 
 .signupbtn {
