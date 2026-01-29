@@ -4,6 +4,7 @@ import upload from './routes/upload'
 import recall from './routes/recall'
 import note from './routes/note'
 import quiz from './routes/quiz'
+import auth from './routes/auth'
 
 
 type Bindings = {
@@ -39,6 +40,7 @@ app.route('/upload', upload)
 app.route('/recall', recall)
 app.route('/notes', note)
 app.route('/quiz', quiz)
+app.route('/auth', auth)
 
 
 
