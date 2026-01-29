@@ -38,7 +38,7 @@ const FlashCard = () => {
   };
 
   const handleGenerate = async () => {
-    console.log('Generate button clicked!', { uploadedFile, inputText: inputText.substring(0, 50) });
+    console.log('Generate button clicked!', { uploadedFile, inputText: inputText.substring(0, 100) });
     setIsProcessing(true);
 
     /*
@@ -340,7 +340,7 @@ const FlashCard = () => {
 
             />
             <p className="text-sm text-gray-500 mt-2">
-              {inputText.length} characters • Minimum 100 characters required
+              {inputText.trim().split(/\s+/).filter(word => word.length > 0).length} words • Minimum 100 words required
             </p>
 
             {/* Generate Button */}

@@ -10,7 +10,7 @@ import Foter from "./Sections/HomePage/Footer";
 import FlashCardGenerator from "./Sections/FlashCard";
 import QuizGenerator from "./Sections/Quiz";
 import Cursor from "./Sections/Common/cursor";
-import AuthModal from "./Sections/User/AuthModal";
+import AuthModal from "./Sections/User/Before/AuthModal";
 
 function HomePage() {
   return (

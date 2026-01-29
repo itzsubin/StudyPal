@@ -1,15 +1,19 @@
 import React, { useEffect } from 'react';
 import { BookOpen, Sparkles, X } from 'lucide-react';
-import LogIn from './LogIn/login';
-import SignUp from './SignUp/signup';
+import LogIn from '../LogIn/login';
+import SignUp from '../SignUp/signup';
+import { useAuth } from '../../../Context/AuthContext';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     const [isLogin, setIsLogin] = React.useState(true);
+    const [showSuccess, setShowSuccess] = React.useState(false);
     const [formData, setFormData] = React.useState({
         name: '',
         email: '',
         password: ''
     });
+
+    const { login, signup, error, loading } = useAuth();
 
     useEffect(() => {
         setIsLogin(initialMode === 'login');
@@ -21,9 +25,26 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         console.log('Form submitted:', formData);
-        // Add actual auth logic here later
+        try {
+            if (isLogin) {
+                await login(formData.email, formData.password);
+                setShowSuccess(true);
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Show success for 2s
+                setShowSuccess(false);
+                onClose(); // Close modal on success
+            } else {
+                await signup(formData); // name, email, password
+                // Maybe auto login or switch to login mode?
+                // For now, let's switch to login mode or close if auto-login
+                setIsLogin(true);
+                // alert("Signup successful! Please login.");
+            }
+        } catch (err) {
+            console.error(err);
+            // handle UI error display if needed (using 'error' from context)
+        }
     };
 
     return (
@@ -41,7 +62,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                     onClick={onClose}
                     className="absolute top-[5px] right-[5px] p-2 rounded-full hover:bg-black/5 transition-colors"
                 >
-                    <X className="w-5 h-5 text-gray-500" />
+                    <X className="w-4 h-4 text-gray-500" />
                 </button>
                 {/* Toggle Buttons */}
                 <div className="flex gap-2 mb-8 bg-gray-100 p-1.5 rounded-2xl">
@@ -72,12 +93,15 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
                         setIsLogin={setIsLogin} // For "Sign up for free" link
+                        isLoading={loading}
+                        showSuccess={showSuccess}
                     />
                 ) : (
                     <SignUp
                         formData={formData}
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
+                        isLoading={loading}
                     />
                 )}
 

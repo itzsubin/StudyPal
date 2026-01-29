@@ -81,7 +81,8 @@ export default function QuizHome() {
                 contextText = uploadData.text;
 
             } else if (activeTab === 'text' && text) {
-                if (text.length < 50) throw new Error('Please enter at least 50 characters of text.');
+                const currentWordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+                if (currentWordCount < 100) throw new Error('Please enter at least 100 words of text.');
                 contextText = text;
             } else {
                 throw new Error('Please upload a file or enter text to generate a quiz.');
@@ -111,7 +112,8 @@ export default function QuizHome() {
 
 
     //const canGenerate = true;
-    const canGenerate = (activeTab === 'upload' && file) || (activeTab === 'text' && text.trim().length > 100);
+    const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    const canGenerate = (activeTab === 'upload' && file) || (activeTab === 'text' && wordCount >= 100);
 
     const resetFlow = () => {
         setCurrentStep(1);
@@ -266,7 +268,7 @@ export default function QuizHome() {
                                         className=" bg-gray-50 w-full h-64 p-6 border-2 border-gray-200 rounded-2xl focus:border-indigo-400 focus:outline-none resize-none text-gray-700 placeholder-gray-400"
                                     />
                                     <p className="text-sm text-gray-500 mt-2">
-                                        {text.length} characters • Minimum 100 characters required
+                                        {text.trim().split(/\s+/).filter(word => word.length > 0).length} words • Minimum 100 words required
                                     </p>
                                 </div>
                             )}
