@@ -26,9 +26,10 @@ quiz.post("/", async (c) => {
 
         const startTime = Date.now();
         const result = await generateQuiz(apiKey, text, numQuestions, difficulty);
+
         const duration = Date.now() - startTime;
 
-        console.log(`[Quiz] Generation successful in ${duration}ms`);
+        console.log(`[Quiz] Generation successful in ${duration}ms.`);
         return c.json(result);
     } catch (error: any) {
         console.error("Error in quiz route:", error);

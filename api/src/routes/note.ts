@@ -8,7 +8,7 @@ type Bindings = {
 
 const note = new Hono<{ Bindings: Bindings }>();
 
-note.post("/", async (c) => {
+note.post("/generate", async (c) => {
     try {
         const { text, limit } = await c.req.json();
 
