@@ -11,7 +11,8 @@ import {
     Save,
     X,
     Flag,
-    Tag
+    Tag,
+    CheckCircle
 } from 'lucide-react';
 
 
@@ -203,7 +204,7 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         }
          */
         try {
-            const response = await fetch('http://localhost:8787/notes', {
+            const response = await fetch('http://localhost:8787/ai/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -281,7 +282,7 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         */
         try {
             const currentNote = notes[currentNoteIndex];
-            const response = await fetch('http://localhost:8787/notes/explain', {
+            const response = await fetch('http://localhost:8787/ai/explain', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -312,11 +313,94 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         setIsEditingTitle(true);
     };
 
-    const handleSaveTitle = () => {
+    const saveNoteToDb = async (note) => {
+        const method = note.dbId ? 'PUT' : 'POST';
+        const url = note.dbId
+            ? `http://localhost:8787/notes/${note.dbId}`
+            : 'http://localhost:8787/notes';
+
+        // Check if note is flagged
+        const isFlagged = reviewLater.includes(note.id);
+        const tags = [...(note.topics || [])];
+        if (isFlagged && !tags.includes('Flagged')) {
+            tags.push('Flagged');
+        }
+
+        const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: note.title,
+                content: JSON.stringify(note.content),
+                tags: tags
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to save note');
+        return await response.json();
+    };
+
+    const handleSaveToLibrary = async () => {
+        try {
+            const currentNote = notes[currentNoteIndex];
+            const savedData = await saveNoteToDb(currentNote);
+
+            const updatedNotes = [...notes];
+            updatedNotes[currentNoteIndex] = {
+                ...currentNote,
+                dbId: savedData.id,
+                isSaved: true
+            };
+            setNotes(updatedNotes);
+            alert('Note saved to library successfully!');
+        } catch (error) {
+            console.error('Error saving note:', error);
+            alert('Failed to save note to library');
+        }
+    };
+
+    const handleDeleteNote = async () => {
+        if (!window.confirm('Are you sure you want to delete this note?')) return;
+
+        try {
+            const currentNote = notes[currentNoteIndex];
+            if (currentNote.dbId) {
+                const response = await fetch(`http://localhost:8787/notes/${currentNote.dbId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete note');
+            }
+
+            const updatedNotes = notes.filter((_, index) => index !== currentNoteIndex);
+            if (updatedNotes.length === 0) {
+                onBack(); // Go back if no notes left
+            } else {
+                setNotes(updatedNotes);
+                if (currentNoteIndex >= updatedNotes.length) {
+                    setCurrentNoteIndex(updatedNotes.length - 1);
+                }
+            }
+        } catch (error) {
+            console.error('Error deleting note:', error);
+            alert('Failed to delete note');
+        }
+    };
+
+    const handleSaveTitle = async () => {
         const updatedNotes = [...notes];
-        updatedNotes[currentNoteIndex].title = editedTitle;
+        const currentNote = { ...updatedNotes[currentNoteIndex] };
+        currentNote.title = editedTitle;
+        updatedNotes[currentNoteIndex] = currentNote;
         setNotes(updatedNotes);
         setIsEditingTitle(false);
+
+        if (currentNote.dbId) {
+            try {
+                await saveNoteToDb(currentNote);
+            } catch (error) {
+                console.error('Error auto-saving title:', error);
+            }
+        }
     };
 
     const handleEditContent = () => {
@@ -324,11 +408,21 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         setIsEditingContent(true);
     };
 
-    const handleSaveContent = () => {
+    const handleSaveContent = async () => {
         const updatedNotes = [...notes];
-        updatedNotes[currentNoteIndex].content = editedContent;
+        const currentNote = { ...updatedNotes[currentNoteIndex] };
+        currentNote.content = editedContent;
+        updatedNotes[currentNoteIndex] = currentNote;
         setNotes(updatedNotes);
         setIsEditingContent(false);
+
+        if (currentNote.dbId) {
+            try {
+                await saveNoteToDb(currentNote);
+            } catch (error) {
+                console.error('Error auto-saving content:', error);
+            }
+        }
     };
 
     const handleContentChange = (index, value) => {
@@ -336,6 +430,8 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         newContent[index].text = value;
         setEditedContent(newContent);
     };
+
+
 
     if (isProcessing) {
         return (
@@ -441,6 +537,25 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
                                 Smart Notes
                             </span>
                         </div>
+                        <button
+                            onClick={handleDeleteNote}
+                            className="bg-red-50 border-2 border-red-200 w-10 h-10 rounded-xl flex items-center justify-center text-red-600 hover:border-red-400 hover:bg-red-100 transition shadow-sm"
+                            title="Delete Note"
+                        >
+                            <X size={20} />
+                        </button>
+                        <button
+                            onClick={handleSaveToLibrary}
+                            title="Save it to access and study later on"
+                            className={`px-4 py-2 rounded-xl flex items-center gap-2 font-bold transition shadow-sm border-2
+                                ${currentNote.isSaved
+                                    ? 'bg-green-100 text-green-700 border-green-200'
+                                    : 'bg-white text-gray-700 border-gray-200 hover:border-green-400 hover:text-green-600'
+                                }`}
+                        >
+                            <Save size={18} />
+                            {currentNote.isSaved ? 'Saved' : 'Save to Library'}
+                        </button>
                     </div>
                 </div>
 

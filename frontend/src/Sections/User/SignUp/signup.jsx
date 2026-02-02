@@ -8,7 +8,7 @@ export default function SignUp({ formData, handleChange, handleSubmit, isLoading
         <div className="space-y-5">
             {/* Name Field */}
             <div className="transform transition-all duration-300">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block pr-[380px] text-sm font-medium text-gray-700 mb-2">
                     Full Name
                 </label>
                 <div className="relative">
@@ -26,7 +26,7 @@ export default function SignUp({ formData, handleChange, handleSubmit, isLoading
 
             {/* Email Field */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block pr-[349px] text-sm font-medium text-gray-700 mb-2">
                     Email Address
                 </label>
                 <div className="relative">
@@ -44,7 +44,7 @@ export default function SignUp({ formData, handleChange, handleSubmit, isLoading
 
             {/* Password Field */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block pr-[380px] text-sm font-medium text-gray-700 mb-2">
                     Password
                 </label>
                 <div className="relative">

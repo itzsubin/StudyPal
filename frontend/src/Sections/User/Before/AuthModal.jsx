@@ -3,6 +3,7 @@ import { BookOpen, Sparkles, X } from 'lucide-react';
 import LogIn from '../LogIn/login';
 import SignUp from '../SignUp/signup';
 import { useAuth } from '../../../Context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     const [isLogin, setIsLogin] = React.useState(true);
@@ -14,6 +15,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     });
 
     const { login, signup, error, loading } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setIsLogin(initialMode === 'login');
@@ -34,6 +36,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 await new Promise(resolve => setTimeout(resolve, 2000)); // Show success for 2s
                 setShowSuccess(false);
                 onClose(); // Close modal on success
+                // navigate('/dashboard'); // Removed at user request: Stay on current page, but state updates to logged in.
             } else {
                 await signup(formData); // name, email, password
                 // Maybe auto login or switch to login mode?

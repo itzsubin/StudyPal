@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './NavbarStyles.module.css';
 import logo from '../../../assets/logo.png';
+import Menu from '../../User/After/Menu/menu';
 
 function Navbar(props) {
   const location = useLocation();
@@ -63,21 +64,29 @@ function Navbar(props) {
         </Link>
       </div>
       <div className={styles.buttoncontainer}>
-        <div
-          onClick={props.onLoginClick}
-          className={styles.loginbtn}
-          style={{ cursor: 'pointer' }}
-        >
-          Login
-        </div>
+        {props.user ? (
+          <div style={{ position: 'relative', width: '100px', height: '50px', zIndex: 9999 }}>
+            <Menu />
+          </div>
+        ) : (
+          <>
+            <div
+              onClick={props.onLoginClick}
+              className={styles.loginbtn}
+              style={{ cursor: 'pointer' }}
+            >
+              Login
+            </div>
 
-        <div
-          onClick={props.onSignupClick}
-          className={styles.signupbtn}
-          style={{ cursor: 'pointer' }}
-        >
-          Sign Up
-        </div>
+            <div
+              onClick={props.onSignupClick}
+              className={styles.signupbtn}
+              style={{ cursor: 'pointer' }}
+            >
+              Sign Up
+            </div>
+          </>
+        )}
       </div>
       <hr className={styles.line} />
     </nav>

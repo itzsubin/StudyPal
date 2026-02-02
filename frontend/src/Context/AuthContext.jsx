@@ -5,26 +5,34 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const checkUser = () => {
-            const currentUser = authService.getCurrentUser();
-            setUser(currentUser);
-            setLoading(false);
-        };
-        checkUser();
-    }, []);
+    // useEffect(() => {
+    //     const checkUser = () => {
+    //         const currentUser = authService.getCurrentUser();
+    //         setUser(currentUser);
+    //         setLoading(false);
+    //     };
+    //     checkUser();
+    // }, []);
 
     const login = async (email, password) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await authService.login(email, password);
-            console.log('AuthContext: Login success, setting user:', data);
-            setUser(data);
-            return data;
+            // Mock login for UI development
+            console.log('AuthContext: Mocking login success');
+            const mockUser = { name: 'Test User', email: email || 'test@example.com' };
+            setUser(mockUser);
+            // Simulate a short delay if needed, or return immediately
+            // await new Promise(resolve => setTimeout(resolve, 500)); 
+            return mockUser;
+
+            // Original code bypassed:
+            // const data = await authService.login(email, password);
+            // setUser(data);
+            // return data;
         } catch (err) {
             setError(err.message || 'Login failed');
             throw err;

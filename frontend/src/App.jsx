@@ -1,6 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from './Context/AuthContext';
 import Navbar from "./Sections/HomePage/Navbar";
 import Home from "./Sections/HomePage/Home";
 import Info from "./Sections/HomePage/Info";
@@ -11,6 +12,7 @@ import FlashCardGenerator from "./Sections/FlashCard";
 import QuizGenerator from "./Sections/Quiz";
 import Cursor from "./Sections/Common/cursor";
 import AuthModal from "./Sections/User/Before/AuthModal";
+import Menu from "./Sections/User/After/Menu/menu";
 
 function HomePage() {
   return (
@@ -26,6 +28,7 @@ function HomePage() {
 
 function AppContent() {
   const location = useLocation();
+  const { user } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
 
@@ -39,6 +42,7 @@ function AppContent() {
       <Navbar
         onLoginClick={() => openAuth('login')}
         onSignupClick={() => openAuth('signup')}
+        user={user}
       />
       <AuthModal
         isOpen={isAuthOpen}
@@ -50,6 +54,9 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/flashcard" element={<FlashCardGenerator />} />
         <Route path="/quiz" element={<QuizGenerator />} />
+        <Route path="/Menu" element={<Menu />} />
+
+
       </Routes>
     </>
   );

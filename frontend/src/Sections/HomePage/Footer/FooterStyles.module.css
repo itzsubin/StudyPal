@@ -7,6 +7,8 @@
      width: 100vw;
      margin-left: calc(-50vw + 50%);
      overflow: hidden;
+     background: linear-gradient(to bottom, #eff6ff 0%, #faf5ff 50%, #fce7f3 100%);
+     background-attachment: fixed;
 }
 
 

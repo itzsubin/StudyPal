@@ -8,7 +8,7 @@ export default function LogIn({ formData, handleChange, handleSubmit, setIsLogin
         <div className="space-y-5">
             {/* Email Field */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block pr-[350px]  text-sm font-medium text-gray-700 mb-2">
                     Email Address
                 </label>
                 <div className="relative">
@@ -26,7 +26,7 @@ export default function LogIn({ formData, handleChange, handleSubmit, setIsLogin
 
             {/* Password Field */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block pr-[380px]  text-sm font-medium text-gray-700 mb-2">
                     Password
                 </label>
                 <div className="relative">
