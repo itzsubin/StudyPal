@@ -1,13 +1,18 @@
 import { Hono } from "hono";
-import { db } from "../db";
+import { createDb } from "../db";
 import { notes } from "../db/schema";
 import { eq, desc } from "drizzle-orm";
 
-const app = new Hono();
+type Bindings = {
+    DATABASE_URL: string;
+};
+
+const app = new Hono<{ Bindings: Bindings }>();
 
 // GET all notes (ordered by newest first)
 app.get("/", async (c) => {
     try {
+        const db = createDb(c.env.DATABASE_URL);
         const allNotes = await db.select().from(notes).orderBy(desc(notes.createdAt));
         return c.json(allNotes);
     } catch (error: any) {
@@ -19,6 +24,7 @@ app.get("/", async (c) => {
 app.get("/:id", async (c) => {
     const id = parseInt(c.req.param("id"));
     try {
+        const db = createDb(c.env.DATABASE_URL);
         const result = await db.select().from(notes).where(eq(notes.id, id)).limit(1);
         if (result.length === 0) return c.json({ error: "Note not found" }, 404);
         return c.json(result[0]);
@@ -36,6 +42,7 @@ app.post("/", async (c) => {
             return c.json({ error: "Title and content are required" }, 400);
         }
 
+        const db = createDb(c.env.DATABASE_URL);
         const newNote = await db.insert(notes).values({
             title,
             content,
@@ -56,6 +63,7 @@ app.put("/:id", async (c) => {
     try {
         const { title, content, tags } = await c.req.json();
 
+        const db = createDb(c.env.DATABASE_URL);
         const updatedNote = await db.update(notes)
             .set({
                 title,
@@ -78,6 +86,7 @@ app.put("/:id", async (c) => {
 app.delete("/:id", async (c) => {
     const id = parseInt(c.req.param("id"));
     try {
+        const db = createDb(c.env.DATABASE_URL);
         const deleted = await db.delete(notes).where(eq(notes.id, id)).returning();
         if (deleted.length === 0) return c.json({ error: "Note not found" }, 404);
         return c.json({ message: "Note deleted successfully", id });
