@@ -1,20 +1,45 @@
+import { useRef } from 'react';
 import styles from "./HomeStyles.module.css";
 import A from "../../../assets/A.png";
 import arrow from "../../../assets/arrow.png";
 import { Brain, Target, TrendingUp, Users } from 'lucide-react';
 
 function Home() {
+  const containerRef = useRef(null);
+  const aRef = useRef(null);
+  const arrowRef = useRef(null);
+
+  const handleMouseMove = (e) => {
+    if (!containerRef.current || !aRef.current || !arrowRef.current) return;
+
+    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - left) / width - 0.5;
+    const y = (e.clientY - top) / height - 0.5;
+
+
+    aRef.current.style.transform = `perspective(1000px) rotateY(${x * 30 + 45}deg) rotateX(${-y * 30}deg)`;
+
+
+    arrowRef.current.style.transform = `translate(${x * -50}px, ${y * -50}px) rotateZ(30deg) rotateY(190deg) rotateX(70deg)`;
+  };
+
   return (
-    <section id='home' className={styles.container}>
+    <section id='home' className={styles.container} ref={containerRef} onMouseMove={handleMouseMove} onMouseLeave={() => {
+      if (aRef.current) aRef.current.style.transform = `perspective(1000px) rotateY(45deg) rotateX(0deg)`;
+      if (arrowRef.current) arrowRef.current.style.transform = `rotateZ(30deg) rotateY(190deg) rotateX(70deg)`;
+    }}>
       <div className={styles.grade}>
         <img
+          ref={aRef}
           src={A}
           alt="Grade decoration"
           className={styles.A}
+          style={{ transition: 'transform 0.1s ease-out' }}
         />
       </div>
 
       <div className="relative z-10 text-center">
+        {/* ... rest of your content ... */}
         <div className="inline-flex items-center gap-2 bg-white px-4 py-2.5 rounded-full shadow-sm mb-8 md:mb-10 lg:mb-12">
           <span className="text-m font-bold text-gray-700">
             AI assists. The student decides.

@@ -4,8 +4,8 @@ const API_URL = 'http://localhost:8787/auth/';
 const authService = {
     login: async (email, password) => {
         try {
-            console.log("Simulating 30s delay...");
-            await new Promise(resolve => setTimeout(resolve, 5000)); // 5 second delay
+            console.log("Simulating 10s delay...");
+            await new Promise(resolve => setTimeout(resolve, 10000)); // 10 second delay
             console.log('Sending login request to:', `${API_URL}login`);
             console.log('Payload:', { email, password });
             const response = await fetch(`${API_URL}login`, {

@@ -1,18 +1,13 @@
-:root {
-  --gradient-primary: linear-gradient(to bottom, #eff6ff 0%, #faf5ff 50%, #fce7f3 100%);
-  --gradient-text: linear-gradient(to right, #2563eb, #9333ea, #db2777);
-}
-
 .container {
   position: relative;
   padding-top: 8.5rem;
   padding-bottom: 3rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  background: var(--gradient-primary);
+  background: transparent;
   width: 100vw;
   height: 45vw;
-     margin-left: calc(-50vw + 50%);
+  margin-left: calc(-50vw + 50%);
   overflow: hidden;
 }
 
@@ -40,5 +35,3 @@
   transform: rotateZ(30deg) rotateY(190deg) rotateX(70deg);
   overflow: hidden;
 }
-
-

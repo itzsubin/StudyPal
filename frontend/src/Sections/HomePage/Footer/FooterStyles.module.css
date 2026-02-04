@@ -1,21 +1,20 @@
 .container {
      position: relative;
      padding-top: 5.5rem;
-     padding-bottom: 5rem;
      padding-left: 1rem;
      padding-right: 1rem;
      width: 100vw;
      margin-left: calc(-50vw + 50%);
      overflow: hidden;
-     background: linear-gradient(to bottom, #eff6ff 0%, #faf5ff 50%, #fce7f3 100%);
-     background-attachment: fixed;
+     background: transparent;
 }
 
 
 .logocontainer {
-     margin-left: 60px;
+     margin-left: 30px;
      position: relative;
-     bottom: 82px;
+     bottom: 10px;
+
 
 }
 

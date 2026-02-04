@@ -4,54 +4,59 @@
   padding-bottom: 5rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  background: white;
+  background: transparent;
   height: 45.5vw;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   overflow: hidden;
 }
+
 .description1 {
-  color: #4b5563;        
-  font-size: 0.875rem;   
-  line-height: 1.5;      
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.5;
   margin-left: -5.5rem;
   margin-top: 0rem;
   margin-bottom: 1rem;
 }
+
 .description2 {
-  color: #4b5563;        
-  font-size: 0.875rem;   
-  line-height: 1.5;      
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.5;
   margin-left: -6rem;
   margin-top: 0rem;
   margin-bottom: 1rem;
 }
+
 .description3 {
-  color: #4b5563;        
-  font-size: 0.875rem;   
-  line-height: 1.5;      
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.5;
   margin-left: -8rem;
   margin-top: 0rem;
   margin-bottom: 1rem;
 }
+
 .description4 {
-  color: #4b5563;        
-  font-size: 0.875rem;   
-  line-height: 1.5;      
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.5;
   margin-left: -7rem;
   margin-top: 0rem;
   margin-bottom: 1rem;
 }
+
 .description5 {
-  color: #4b5563;        
-  font-size: 0.875rem;   
-  line-height: 1.5;      
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.5;
   margin-left: -14rem;
   margin-top: 0rem;
   margin-bottom: 1rem;
 }
 
-.thread{
+.thread {
   position: relative;
   right: 140px;
   top: -43px;

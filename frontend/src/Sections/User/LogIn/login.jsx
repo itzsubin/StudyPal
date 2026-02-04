@@ -75,7 +75,8 @@ export default function LogIn({ formData, handleChange, handleSubmit, setIsLogin
                     </>
                 ) : showSuccess ? (
                     <>
-                        <span className="text-lg">Yahh logged in! 🎉</span>
+                        <span>Logged in</span>
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </>
                 ) : (
                     <>

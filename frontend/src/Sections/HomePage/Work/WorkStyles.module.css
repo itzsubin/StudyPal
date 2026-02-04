@@ -4,9 +4,9 @@
   padding-bottom: 5rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  background: linear-gradient(to bottom, #f9fafb, #ffffff);
+  background: transparent;
   height: 57.5vw;
   width: 100vw;
-     margin-left: calc(-50vw + 50%);
+  margin-left: calc(-50vw + 50%);
   overflow: hidden;
 }
