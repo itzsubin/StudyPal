@@ -3,7 +3,7 @@ import { cors } from 'hono/cors'
 import upload from './routes/upload'
 import recall from './routes/recall'
 import note from './routes/note'
-import notes from './routes/notes'
+import notes from './routes/notesdb'
 import quiz from './routes/quiz'
 import auth from './routes/auth'
 
