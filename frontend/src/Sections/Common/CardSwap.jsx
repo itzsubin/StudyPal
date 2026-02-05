@@ -76,6 +76,9 @@ const CardSwap = ({
 
     useEffect(() => {
         const total = refs.length;
+        // Reset order whenever dependencies change to handle dynamic children
+        order.current = Array.from({ length: total }, (_, i) => i);
+
         refs.forEach((r, i) => placeNow(r.current, makeSlot(i, cardDistance, verticalDistance, total), skewAmount));
 
         const swap = () => {
@@ -139,27 +142,30 @@ const CardSwap = ({
         swap();
         intervalRef.current = window.setInterval(swap, delay);
 
-        if (pauseOnHover) {
-            const node = container.current;
-            const pause = () => {
-                tlRef.current?.pause();
-                clearInterval(intervalRef.current);
-            };
-            const resume = () => {
-                tlRef.current?.play();
-                intervalRef.current = window.setInterval(swap, delay);
-            };
+        const node = container.current;
+        const pause = () => {
+            tlRef.current?.pause();
+            clearInterval(intervalRef.current);
+        };
+        const resume = () => {
+            tlRef.current?.play();
+            intervalRef.current = window.setInterval(swap, delay);
+        };
+
+        if (pauseOnHover && node) {
             node.addEventListener('mouseenter', pause);
             node.addEventListener('mouseleave', resume);
-            return () => {
+        }
+
+        return () => {
+            clearInterval(intervalRef.current);
+            tlRef.current?.kill();
+            if (pauseOnHover && node) {
                 node.removeEventListener('mouseenter', pause);
                 node.removeEventListener('mouseleave', resume);
-                clearInterval(intervalRef.current);
-            };
-        }
-        return () => clearInterval(intervalRef.current);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing]);
+            }
+        };
+    }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, refs.length, config]);
 
     const rendered = childArr.map((child, i) =>
         isValidElement(child)
