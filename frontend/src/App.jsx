@@ -14,10 +14,10 @@ import Cursor from "./Sections/Common/cursor";
 import AuthModal from "./Sections/User/Before/AuthModal";
 import Menu from "./Sections/User/After/Menu/menu";
 
-function HomePage() {
+const HomePage = ({ onStartClick, user }) => {
   return (
     <>
-      <Home />
+      <Home onStartClick={onStartClick} user={user} />
       <Info />
       <Work />
       <Visual />
@@ -51,7 +51,7 @@ function AppContent() {
       />
       {location.pathname === "/" && !isAuthOpen && <Cursor />}
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomePage onStartClick={() => openAuth('signup')} user={user} />} />
         <Route path="/flashcard" element={<FlashCardGenerator />} />
         <Route path="/quiz" element={<QuizGenerator />} />
         <Route path="/Menu" element={<Menu />} />

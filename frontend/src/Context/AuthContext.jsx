@@ -24,9 +24,9 @@ export const AuthProvider = ({ children }) => {
             // Mock login for UI development
             console.log('AuthContext: Mocking login success');
             const mockUser = { name: 'Test User', email: email || 'test@example.com' };
+            // Simulate a short delay so loading state is visible
+            await new Promise(resolve => setTimeout(resolve, 1500));
             setUser(mockUser);
-            // Simulate a short delay if needed, or return immediately
-            // await new Promise(resolve => setTimeout(resolve, 500)); 
             return mockUser;
 
             // Original code bypassed:

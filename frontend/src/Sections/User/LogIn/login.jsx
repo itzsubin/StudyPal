@@ -1,7 +1,7 @@
 import React from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
-export default function LogIn({ formData, handleChange, handleSubmit, setIsLogin, isLoading, showSuccess }) {
+export default function LogIn({ formData, handleChange, handleSubmit, setIsLogin, isLoading, showSuccess, onClose }) {
     const [showPassword, setShowPassword] = React.useState(false);
 
     return (
@@ -59,10 +59,7 @@ export default function LogIn({ formData, handleChange, handleSubmit, setIsLogin
             <button
                 onClick={handleSubmit}
                 disabled={isLoading || showSuccess}
-                className={`w-full py-4 font-semibold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 group ${isLoading || showSuccess ? 'opacity-90 cursor-not-allowed scale-100' : ''
-                    } ${showSuccess
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 font-semibold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 group ${isLoading || showSuccess ? 'opacity-90 cursor-not-allowed scale-100' : ''
                     }`}
             >
                 {isLoading ? (
@@ -74,11 +71,9 @@ export default function LogIn({ formData, handleChange, handleSubmit, setIsLogin
                         <span>Processing...</span>
                     </>
                 ) : showSuccess ? (
-                    <>
-                        <span>Logged in</span>
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
+                    <></>
                 ) : (
+
                     <>
                         <span>Login</span>
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

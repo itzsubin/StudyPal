@@ -4,7 +4,7 @@ import A from "../../../assets/A.png";
 import arrow from "../../../assets/arrow.png";
 import { Brain, Target, TrendingUp, Users } from 'lucide-react';
 
-function Home() {
+function Home({ onStartClick, user }) {
   const containerRef = useRef(null);
   const aRef = useRef(null);
   const arrowRef = useRef(null);
@@ -59,9 +59,13 @@ function Home() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 md:mb-14 lg:mb-16">
-          <button className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-10 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
-            <span>Start with StudyPal</span>
-          </button>
+          {!user && (
+            <button
+              onClick={onStartClick}
+              className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-10 py-4 rounded-xl text-lg font-bold hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+              <span>Start with StudyPal</span>
+            </button>
+          )}
           <button className="bg-white border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-xl text-lg font-bold hover:border-blue-600 hover:text-blue-600 hover:shadow-md transition-all duration-300">
             Begin your study plan
           </button>

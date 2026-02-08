@@ -32,10 +32,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
         try {
             if (isLogin) {
                 await login(formData.email, formData.password);
-                setShowSuccess(true);
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Show success for 2s
-                setShowSuccess(false);
+                await login(formData.email, formData.password);
+                console.log('Login successful');
                 onClose(); // Close modal on success
+
                 // navigate('/dashboard'); // Removed at user request: Stay on current page, but state updates to logged in.
             } else {
                 await signup(formData); // name, email, password
