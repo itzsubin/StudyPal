@@ -204,7 +204,7 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         }
          */
         try {
-            const response = await fetch('http://localhost:8787/ai/generate', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/ai/generate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -282,7 +282,7 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         */
         try {
             const currentNote = notes[currentNoteIndex];
-            const response = await fetch('http://localhost:8787/ai/explain', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/ai/explain`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -316,8 +316,8 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
     const saveNoteToDb = async (note) => {
         const method = note.dbId ? 'PUT' : 'POST';
         const url = note.dbId
-            ? `http://localhost:8787/notes/${note.dbId}`
-            : 'http://localhost:8787/notes';
+            ? `${import.meta.env.VITE_API_URL}/notes/${note.dbId}`
+            : `${import.meta.env.VITE_API_URL}/notes`;
 
         // Check if note is flagged
         const isFlagged = reviewLater.includes(note.id);
@@ -365,7 +365,7 @@ const SmartNote = ({ onBack, extractedText, fileName }) => {
         try {
             const currentNote = notes[currentNoteIndex];
             if (currentNote.dbId) {
-                const response = await fetch(`http://localhost:8787/notes/${currentNote.dbId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/notes/${currentNote.dbId}`, {
                     method: 'DELETE'
                 });
                 if (!response.ok) throw new Error('Failed to delete note');

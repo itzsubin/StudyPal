@@ -22,7 +22,7 @@ const YourNotes = () => {
     const fetchNotes = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:8787/notes');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/notes`);
             if (response.ok) {
                 const data = await response.json();
                 setNotes(data);
@@ -38,7 +38,7 @@ const YourNotes = () => {
         if (!window.confirm('Are you sure you want to delete this note?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8787/notes/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/notes/${id}`, {
                 method: 'DELETE'
             });
             if (response.ok) {
@@ -150,8 +150,8 @@ const YourNotes = () => {
                                         <span
                                             key={idx}
                                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${tag === 'Flagged'
-                                                    ? 'bg-orange-100 text-orange-700'
-                                                    : 'bg-blue-50 text-blue-700'
+                                                ? 'bg-orange-100 text-orange-700'
+                                                : 'bg-blue-50 text-blue-700'
                                                 }`}
                                         >
                                             <Tag className="w-3 h-3" />

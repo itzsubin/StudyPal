@@ -27,7 +27,7 @@ export default function QuizCard({ text, numQuestions, difficulty, onBack, onRes
 
 
                 // COMPLETED: Real Backend Integration
-                const response = await fetch('http://localhost:8787/quiz', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/quiz`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

@@ -65,7 +65,7 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8787/recall', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/recall`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
         setShowHint(true);
 
         try {
-            const response = await fetch('http://localhost:8787/recall/hint', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/recall/hint`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -209,7 +209,7 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
         setShowExplanation(true);
 
         try {
-            const response = await fetch('http://localhost:8787/recall/explain', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/recall/explain`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

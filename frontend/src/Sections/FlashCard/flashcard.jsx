@@ -57,12 +57,12 @@ const FlashCard = () => {
         const formData = new FormData();
         formData.append('file', uploadedFile);
 
-        response = await fetch('http://localhost:8787/upload', {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
           method: 'POST',
           body: formData,
         });
       } else {
-        response = await fetch('http://localhost:8787/upload', {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ const FlashCard = () => {
     setIsTestingConnection(true);
     setConnectionStatus('checking');
     try {
-      const response = await fetch('http://localhost:8787/health');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/health`);
       const data = await response.json();
       if (response.ok && data.healthy) {
         setConnectionStatus('online');

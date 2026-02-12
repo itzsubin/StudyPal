@@ -70,7 +70,7 @@ export default function QuizHome() {
                 const formData = new FormData();
                 formData.append('file', file);
 
-                const uploadResponse = await fetch('http://localhost:8787/upload', {
+                const uploadResponse = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
                     method: 'POST',
                     body: formData,
                 });
