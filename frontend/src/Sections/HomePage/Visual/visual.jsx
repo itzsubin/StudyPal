@@ -10,11 +10,13 @@ function Visual() {
         <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-3xl p-12 lg:p-16 shadow-xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              <h3 className="text-3xl font-bold text-gray-900 mb-6">
                 Built for students who want to focus
               </h3>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                No distractions. No overwhelming features. No bloat. Just the tools you need to study effectively and retain what matters.
+              <p className="text-xl text-gray-700 mb-6 text-justify leading-relaxed">
+                Focused, Minimal, Effective
+                <br />
+                Tools you need to study effectively and retain what matters
               </p>
 
               <ul>
@@ -49,17 +51,17 @@ function Visual() {
                   Practice with instant feedback on what you know
                 </li>
 
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">
-                    Track your learning progress
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold text-gray-900">
+                      Track your learning progress
+                    </div>
                   </div>
-                </div>
-              </li>
-              <li className={styles.description4}>
-                See exactly where you are and what needs attention
-              </li>
+                </li>
+                <li className={styles.description4}>
+                  See exactly where you are and what needs attention
+                </li>
 
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-6 h-6 text-indigo-600 mt-0.5 flex-shrink-0" />
@@ -89,7 +91,7 @@ function Visual() {
             </div>
           </div>
         </div>
-        </div>
+      </div>
     </section>
   );
 }

@@ -7,13 +7,17 @@ const Menu = () => {
     return (
         <StaggeredMenu
             items={[
-                { id: 'dashboard', label: 'Dashboard', link: '#' },
+                { id: 'dashboard', label: 'Dashboard', link: '/dashboard' },
                 { id: 'timed-session', label: 'Time-based Session', link: '#' },
                 { id: 'your-notes', label: 'Your Notes', link: '#' },
             ]}
             onNavigate={(id) => {
                 console.log('Navigate to:', id);
-                navigate(id);
+                if (id === 'dashboard') {
+                    navigate('/dashboard');
+                } else {
+                    navigate('/' + id);
+                }
 
             }}
             onSignOut={() => {

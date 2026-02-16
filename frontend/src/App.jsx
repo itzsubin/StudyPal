@@ -12,7 +12,8 @@ import FlashCardGenerator from "./Sections/FlashCard";
 import QuizGenerator from "./Sections/Quiz";
 import Cursor from "./Sections/Common/cursor";
 import AuthModal from "./Sections/User/Before/AuthModal";
-import Menu from "./Sections/User/After/Menu/menu";
+import AfterLogin from "./Sections/User/After";
+import Dashboard from "./Sections/User/After/Main Dashboard/Dashboard/dashboard";
 
 const HomePage = ({ onStartClick, user }) => {
   return (
@@ -37,13 +38,17 @@ function AppContent() {
     setIsAuthOpen(true);
   };
 
+  const isAfterLoginPage = location.pathname.startsWith("/Menu");
+
   return (
     <>
-      <Navbar
-        onLoginClick={() => openAuth('login')}
-        onSignupClick={() => openAuth('signup')}
-        user={user}
-      />
+      {!isAfterLoginPage && (
+        <Navbar
+          onLoginClick={() => openAuth('login')}
+          onSignupClick={() => openAuth('signup')}
+          user={user}
+        />
+      )}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
@@ -54,9 +59,8 @@ function AppContent() {
         <Route path="/" element={<HomePage onStartClick={() => openAuth('signup')} user={user} />} />
         <Route path="/flashcard" element={<FlashCardGenerator />} />
         <Route path="/quiz" element={<QuizGenerator />} />
-        <Route path="/Menu" element={<Menu />} />
-
-
+        <Route path="/Menu" element={<AfterLogin userName={user?.name} />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </>
   );

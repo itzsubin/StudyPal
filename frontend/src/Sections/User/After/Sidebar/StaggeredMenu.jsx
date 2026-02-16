@@ -433,29 +433,41 @@ const StaggeredMenu = ({
                         {items && items.length ? (
                             items.map((it, idx) => (
                                 <li className="sm-panel-itemWrap" key={it.label + idx}>
-                                    <a
+                                    <div
                                         className="sm-panel-item"
-                                        href={it.link || "#"}
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={(e) => handleItemClick(e, it)}
                                         aria-label={it.ariaLabel}
                                         data-index={idx + 1}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                handleItemClick(e, it);
+                                            }
+                                        }}
                                     >
                                         <span className="sm-panel-itemLabel">{it.label}</span>
-                                    </a>
+                                    </div>
                                 </li>
                             ))
                         ) : (
                             null
                         )}
                         <li className="sm-panel-itemWrap" key="sign-out">
-                            <a
+                            <div
                                 className="sm-panel-item"
-                                href="#"
+                                role="button"
+                                tabIndex={0}
                                 onClick={handleSignOutClick}
                                 aria-label="Sign Out"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        handleSignOutClick(e);
+                                    }
+                                }}
                             >
                                 <span className="sm-panel-itemLabel" style={{ color: '#ff4444' }}>Sign Out</span>
-                            </a>
+                            </div>
                         </li>
                     </ul>
                     {displaySocials && socialItems && socialItems.length > 0 && (
