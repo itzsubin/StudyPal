@@ -5,6 +5,8 @@ import ProgressCards from "./ProgressCard/progresscard";
 import SavedNotes from "./SavedNotes/savednotes";
 import TrackersConnected from "./Trackers/trackers";
 import DevelopedAreas from "./Stats/stats";
+import { FocusingChart } from "../Graph/graph";
+import ApiStatus from "../API/api";
 
 const Dashboard = () => {
     return (
@@ -22,6 +24,8 @@ const Dashboard = () => {
                                 <TrackersConnected />
                             </div>
                         </div>
+                        <FocusingChart />
+                        <ApiStatus />
                     </div>
 
                     {/* Right Column */}
