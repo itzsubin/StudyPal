@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from './Context/AuthContext';
 import Navbar from "./Sections/HomePage/Navbar";
@@ -27,6 +27,13 @@ const HomePage = ({ onStartClick, user }) => {
   );
 }
 
+const ProtectedRoute = ({ user, children }) => {
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
 function AppContent() {
   const location = useLocation();
   const { user } = useAuth();
@@ -38,7 +45,7 @@ function AppContent() {
     setIsAuthOpen(true);
   };
 
-  const isAfterLoginPage = location.pathname.startsWith("/Menu");
+  const isAfterLoginPage = location.pathname.startsWith("/Menu") || location.pathname.startsWith("/dashboard");
 
   return (
     <>
@@ -59,8 +66,16 @@ function AppContent() {
         <Route path="/" element={<HomePage onStartClick={() => openAuth('signup')} user={user} />} />
         <Route path="/flashcard" element={<FlashCardGenerator />} />
         <Route path="/quiz" element={<QuizGenerator />} />
-        <Route path="/Menu" element={<AfterLogin userName={user?.name} />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/Menu" element={
+          <ProtectedRoute user={user}>
+            <AfterLogin userName={user?.name} />
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard" element={
+          <ProtectedRoute user={user}>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
       </Routes>
     </>
   );

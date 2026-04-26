@@ -8,14 +8,14 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // useEffect(() => {
-    //     const checkUser = () => {
-    //         const currentUser = authService.getCurrentUser();
-    //         setUser(currentUser);
-    //         setLoading(false);
-    //     };
-    //     checkUser();
-    // }, []);
+    useEffect(() => {
+        const checkUser = () => {
+            const currentUser = authService.getCurrentUser();
+            setUser(currentUser);
+            setLoading(false);
+        };
+        checkUser();
+    }, []);
 
     const login = async (email, password) => {
         setLoading(true);
