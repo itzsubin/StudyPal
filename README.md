@@ -2,7 +2,7 @@
 
 A web application that transforms user-provided study materials (text, PDFs) into an interactive learning session with AI-generated flashcards, quizzes, and a chat-based Q&A.
 
-## 🌟 Features
+##  Features
 
 - **Upload Study Materials:** Seamlessly upload text or PDF files to create study contexts.
 - **AI-Generated Flashcards:** Automatically extract key concepts and definitions into interactive flashcards.
@@ -27,7 +27,7 @@ A web application that transforms user-provided study materials (text, PDFs) int
 - **AI Integration:** Mistral AI
 - **PDF Parsing:** pdf-parse
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -98,7 +98,7 @@ The frontend will be available at `http://localhost:5173` (or the port specified
 - `/api` - Contains the backend Cloudflare Worker, Hono API routes, and Drizzle database schemas.
 - `/frontend` - Contains the React application, UI components, and state management.
 
-## 📄 Scripts Overview
+##  Scripts Overview
 
 ### Frontend (`/frontend`)
 - `npm run dev` - Starts the Vite development server.
