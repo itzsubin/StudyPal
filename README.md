@@ -10,7 +10,7 @@ A web application that transforms user-provided study materials (text, PDFs) int
 - **Interactive Q&A Chat:** Chat with your study materials to ask questions, get explanations, and clarify complex topics.
 - **Modern UI/UX:** Beautiful, responsive, and animated user interface using the latest web technologies.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - **Framework:** React + Vite
@@ -93,7 +93,7 @@ npm run dev
 
 The frontend will be available at `http://localhost:5173` (or the port specified by Vite), and the backend will run at the port specified by Cloudflare Wrangler (usually `http://localhost:8787`).
 
-## 📁 Project Structure
+## Project Structure
 
 - `/api` - Contains the backend Cloudflare Worker, Hono API routes, and Drizzle database schemas.
 - `/frontend` - Contains the React application, UI components, and state management.
