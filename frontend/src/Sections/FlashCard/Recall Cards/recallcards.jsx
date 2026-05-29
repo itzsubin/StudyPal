@@ -82,7 +82,16 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
                 throw new Error(data.error || 'Failed to generate recall cards');
             }
 
-            setFlashcards(data);
+            // Initialize SM-2 properties for each card
+            const sm2Cards = data.map(card => ({
+                ...card,
+                repetition: 0,
+                interval: 1,
+                easiness: 2.5,
+                nextReview: new Date()
+            }));
+
+            setFlashcards(sm2Cards);
         } catch (error) {
             console.error("Error fetching recall cards:", error);
             const errorMsg = error.message.toLowerCase();
@@ -139,6 +148,47 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
             setReviewCards(reviewCards.filter(id => id !== cardID));
         } else {
             nextCard();
+        }
+    };
+
+    const handleSM2Grade = (grade) => {
+        let currentCard;
+        if (flashcards[currentCardIndex]) {
+            currentCard = flashcards[currentCardIndex];
+        } else {
+            return;
+        }
+
+        let { repetition, interval, easiness } = currentCard;
+
+        if (grade >= 3) {
+            if (repetition === 0) {
+                interval = 1;
+            } else if (repetition === 1) {
+                interval = 6;
+            } else {
+                interval = Math.round(interval * easiness);
+            }
+            repetition += 1;
+        } else {
+            repetition = 0;
+            interval = 1;
+        }
+
+        easiness = easiness + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
+        if (easiness < 1.3) easiness = 1.3;
+
+        const nextReview = new Date();
+        nextReview.setDate(nextReview.getDate() + interval);
+
+        const updatedCards = [...flashcards];
+        updatedCards[currentCardIndex] = { ...currentCard, repetition, interval, easiness, nextReview };
+        setFlashcards(updatedCards);
+
+        if (grade < 3) {
+            markForReview(); // Grade < 3 means failed, queue for review
+        } else {
+            markAsUnderstood(false); // Passed
         }
     };
 
@@ -401,20 +451,34 @@ const RecallCards = ({ onBack, extractedText, fileName }) => {
                     )}
 
                     {isFlipped && !showHint && !showExplanation && (
-                        <div className="flex gap-4 mb-8">
+                        <div className="flex gap-2 mb-8 flex-wrap md:flex-nowrap">
                             <button
-                                onClick={markForReview}
-                                className="flex-1 py-4 rounded-xl text-lg font-semibold border-2 border-yellow-400 flex items-center justify-center gap-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition"
+                                onClick={() => handleSM2Grade(0)}
+                                className="flex-1 py-4 rounded-xl text-base font-semibold border-2 border-red-400 flex flex-col items-center justify-center gap-1 bg-red-50 text-red-700 hover:bg-red-100 transition min-w-[120px]"
                             >
-                                <AlertCircle size={20} />
-                                Review Again
+                                <span>Again</span>
+                                <span className="text-xs font-normal opacity-80">&lt; 1 min</span>
                             </button>
                             <button
-                                onClick={() => markAsUnderstood(false)}
-                                className="flex-1 py-4 rounded-xl text-lg font-semibold border-2 border-green-400 flex items-center justify-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 transition"
+                                onClick={() => handleSM2Grade(3)}
+                                className="flex-1 py-4 rounded-xl text-base font-semibold border-2 border-orange-400 flex flex-col items-center justify-center gap-1 bg-orange-50 text-orange-700 hover:bg-orange-100 transition min-w-[120px]"
                             >
-                                <CheckCircle size={20} />
-                                I Know This
+                                <span>Hard</span>
+                                <span className="text-xs font-normal opacity-80">{flashcards[currentCardIndex]?.repetition === 0 ? '1 day' : '1.2 days'}</span>
+                            </button>
+                            <button
+                                onClick={() => handleSM2Grade(4)}
+                                className="flex-1 py-4 rounded-xl text-base font-semibold border-2 border-blue-400 flex flex-col items-center justify-center gap-1 bg-blue-50 text-blue-700 hover:bg-blue-100 transition min-w-[120px]"
+                            >
+                                <span>Good</span>
+                                <span className="text-xs font-normal opacity-80">{flashcards[currentCardIndex]?.interval === 1 && flashcards[currentCardIndex]?.repetition > 0 ? '6 days' : '10 min'}</span>
+                            </button>
+                            <button
+                                onClick={() => handleSM2Grade(5)}
+                                className="flex-1 py-4 rounded-xl text-base font-semibold border-2 border-green-400 flex flex-col items-center justify-center gap-1 bg-green-50 text-green-700 hover:bg-green-100 transition min-w-[120px]"
+                            >
+                                <span>Easy</span>
+                                <span className="text-xs font-normal opacity-80">4 days</span>
                             </button>
                         </div>
                     )}
